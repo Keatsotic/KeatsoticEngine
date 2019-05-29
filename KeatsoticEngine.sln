@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeatsoticEngine", "KeatsoticEngine\KeatsoticEngine.csproj", "{32061395-3185-409F-BE44-43C1E1FC1F2E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32061395-3185-409F-BE44-43C1E1FC1F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32061395-3185-409F-BE44-43C1E1FC1F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32061395-3185-409F-BE44-43C1E1FC1F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32061395-3185-409F-BE44-43C1E1FC1F2E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E0CA6DC1-61C8-47FD-B651-A4B2EBA4D402}
+	EndGlobalSection
+EndGlobal

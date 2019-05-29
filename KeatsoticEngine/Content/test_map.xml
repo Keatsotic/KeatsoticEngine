@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ArrayOfTile xmlns:xi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Tile>
+		<XPos>12</XPos>
+		<YPos>10</YPos>
+		<ZPos>1</ZPos>
+		<TileFrames>
+			<TileFrame>
+				<TextureXPos>12</TextureXPos>
+				<TextureYPos>10</TextureYPos>
+			</TileFrame>
+		</TileFrames>
+		<AnimationSpeed>0</AnimationSpeed>
+		<TextureName>Tilesets/t_overworld_TEMP</TextureName>
+	</Tile>
+</ArrayOfTile>
