@@ -1,7 +1,8 @@
 ﻿public enum ComponentType
 {
-	Sprite,
-	PlayerInput,
+	Transform,
+	SpriteRenderer,
+	PlayerController,
 	Animation,
 	Collision
 }
@@ -12,6 +13,9 @@ public enum Input
 	Right,
 	Up, 
 	Down,
+	Attack,
+	Jump,
+	Special,
 	None
 }
 
@@ -28,5 +32,15 @@ public enum State
 	Idle,
 	Walk,
 	Attack,
-	Jump
+	Jump,
+
+	Hurt, 
+	Dead,
+
+	//player only states:
+	Fall,
+	Special,
+	Duck,
+	DuckAttack,
+	WallJump
 }

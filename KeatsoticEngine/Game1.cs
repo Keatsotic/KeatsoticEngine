@@ -4,6 +4,8 @@ using KeatsoticEngine.Source.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using KeatsoticEngine.Source.Data;
+using System.Collections.Generic;
 
 namespace KeatsoticEngine
 {
@@ -13,42 +15,52 @@ namespace KeatsoticEngine
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-		public static readonly bool SideScroller = false;
-		public static readonly int Scale = 3;
+		public static readonly bool SideScroller = true;
+		public static readonly int Scale = 1;
+		public static int RoomNumber = 1;
 
 		private GameObject _player;
-		private ManageInput _manageInput;
 		private ManageMap _manageMap;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+			Content.RootDirectory = "Content";
 
-			graphics.PreferredBackBufferWidth = 1920;
-			graphics.PreferredBackBufferHeight = 1080;
-
+			ManageResolution.Init(ref graphics);
+			ManageResolution.SetVirtualResolution(480, 270);
+			ManageResolution.SetResolution(1920, 1080, false);
+			
 			_player = new GameObject();
-			_manageInput = new ManageInput();
-			_manageMap = new ManageMap("test");
+			_manageMap = new ManageMap("m_level_1", graphics);
         }
 
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
-            base.Initialize();
+			// TODO: Add your initialization logic here
+			Camera.Initialize();
+			base.Initialize();
         }
 
         protected override void LoadContent()
         {
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			_manageMap.LoadContent(Content);
-			_player.AddComponent(new Sprite(Content.Load<Texture2D>("Textures/s_player_atlas"), 54, 35, new Vector2(100.0f, 100.0f)));
-			_player.AddComponent(new PlayerInput());
-			_player.AddComponent(new Animation(54, 35, 6));
-			_player.AddComponent(new Collision(_manageMap));
+			_player.AddComponent(new Transform(new Vector2(100.0f, 100.0f)));
+			_player.AddComponent(new SpriteRenderer(Content.Load<Texture2D>("Textures/s_player_atlas"), 54, 35));
+			_player.AddComponent(new PlayerController());
+			_player.AddComponent(new Animation(Content.Load<Texture2D>("Textures/s_player_atlas"), (new SpriteSheetData
+			(
+				54,
+				35,
+				(new List<string> { "Idle", "Walk", "Jump", "Fall", "Duck", "Attack" }),
+				(new List<int[]> { new[] { 0 }, new[] { 1, 2, 3, 4, 5, 6 }, new[] { 7 }, new[] { 8 }, new[] { 9 }, new[] { 10, 11, 12 } }),
+				(new List<float> { 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.1f }),
+				(new List<bool> { true, true, true, true, true, false }
+
+			)))));
+			_player.AddComponent(new Collision(_manageMap, new Rectangle(0, 0, 13, 24), new Vector2(20, 11), Content.Load<Texture2D>("Textures/s_pixel")));
 
             // TODO: use this.Content to load your game content here
         }
@@ -64,10 +76,11 @@ namespace KeatsoticEngine
                 Exit();
 
 			// TODO: Add your update logic here
-			_manageInput.Update(gameTime.ElapsedGameTime.Milliseconds);
-			_manageMap.Update(gameTime.ElapsedGameTime.Milliseconds);
+			_manageMap.Update(gameTime);
+			_player.Update(gameTime);
 
-			_player.Update(gameTime.ElapsedGameTime.Milliseconds);
+			UpdateCamera();
+
 			base.Update(gameTime);
         }
 
@@ -76,11 +89,26 @@ namespace KeatsoticEngine
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
 			// TODO: Add your drawing code here
-			spriteBatch.Begin(SpriteSortMode.BackToFront,BlendState.AlphaBlend, SamplerState.PointClamp);
+			ManageResolution.BeginDraw();
+			spriteBatch.Begin(SpriteSortMode.BackToFront,
+								BlendState.AlphaBlend, 
+								SamplerState.PointClamp, 
+								null, 
+								null, 
+								null, 
+								Camera.GetTransformMatrix());
+
 			_manageMap.Draw(spriteBatch);
 			_player.Draw(spriteBatch);
+
 			spriteBatch.End();
             base.Draw(gameTime);
         }
-    }
+
+		//camera methods
+		private void UpdateCamera()
+		{			
+			Camera.Update(_player.GetComponent<Transform>(ComponentType.Transform).Position);
+		}
+	}
 }

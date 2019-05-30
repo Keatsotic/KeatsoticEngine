@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace KeatsoticEngine.Source
 			_components.Remove(component);
 		}
 
-		public void Update(double gameTime)
+		public void Update(GameTime gameTime)
 		{
 			foreach (var components in _components)
 			{

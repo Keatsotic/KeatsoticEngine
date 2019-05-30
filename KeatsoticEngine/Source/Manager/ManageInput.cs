@@ -1,89 +1,147 @@
-﻿using KeatsoticEngine.Source.UsrEventHandlers;
-using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using KeatsoticEngine.Source.Manager;
+using KeatsoticEngine.Source;
 
-namespace KeatsoticEngine.Source.Manager
-{
-	class ManageInput
-	{
-		private KeyboardState _keyboardstate;
-		private KeyboardState _lastKeyboardState;
-		private Keys _lastKey;
-		private static event EventHandler<NewEventInput> _newInput;
-		private double _counter;
-		private static double _cooldown;
+namespace KeatsoticEngine
+{ 
+    public static class ManageInput 
+    {
+        private static KeyboardState keyboardState = Keyboard.GetState();
+        private static KeyboardState lastKeyboardState;
 
-		public static event EventHandler<NewEventInput> NewInput
+        private static MouseState mouseState;
+        private static MouseState lastMouseState;
+
+        public static void Update()
+        {
+            lastKeyboardState = keyboardState;
+            keyboardState = Keyboard.GetState();
+
+            lastMouseState = mouseState;
+            mouseState = Mouse.GetState();
+        }
+
+        /// <summary>
+        /// Checks if key is currently pressed.
+        /// </summary>
+        public static bool IsKeyDown(Keys input)
+        {
+            return keyboardState.IsKeyDown(input);
+        }
+
+        /// <summary>
+        /// Checks if key is currently up.
+        /// </summary>
+        public static bool IsKeyUp(Keys input)
+        {
+            return keyboardState.IsKeyUp(input);
+        }
+
+        /// <summary>
+        /// Checks if key was just pressed.
+        /// </summary>
+        public static bool KeyPressed(Keys input)
+        {
+            if (keyboardState.IsKeyDown(input) == true && lastKeyboardState.IsKeyDown(input) == false)
+                return true;
+            else
+                return false;
+        }
+
+		/// <summary>
+		/// Checks if key was just released.
+		/// </summary>
+		public static bool KeyReleased(Keys input)
 		{
-			add { _newInput += value; }
-			remove{ _newInput -= value; }
+			if (keyboardState.IsKeyUp(input) == true && lastKeyboardState.IsKeyDown(input) == true)
+				return true;
+			else
+				return false;
 		}
 
-		public static bool ThrottleInput { get; set; }
-		public static bool LockMovement { get; set; }
+		/// <summary>
+		/// Returns whether or not the left mouse button is being pressed.
+		/// </summary>
+		public static bool MouseLeftDown()
+        {
+            if (mouseState.LeftButton == ButtonState.Pressed)
+                return true;
+            else
+                return false;
+        }
 
-		public ManageInput()
-		{
-			ThrottleInput = false;
-			LockMovement = false;
-			_counter = 0;
-		}
+        /// <summary>
+        /// Returns whether or not the right mouse button is being pressed.
+        /// </summary>
+        public static bool MouseRightDown()
+        {
+            if (mouseState.RightButton == ButtonState.Pressed)
+                return true;
+            else
+                return false;
+        }
 
-		public void Update(double gameTime)
-		{
-			if (_cooldown > 0)
-			{
-				_counter += gameTime;
-				if (_counter > gameTime)
-				{
-					_cooldown = 0;
-					_counter = 0;
-				}
-				else
-				{
-					return;
-				}
-			}
-			ComputerControls(gameTime);
-		}
+        /// <summary>
+        /// Checks if the left mouse button was clicked.
+        /// </summary>
+        public static bool MouseLeftClicked()
+        {
+            if (mouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
+                return true;
+            else
+                return false;
+        }
 
-		public void ComputerControls(double gameTime)
-		{
-			_keyboardstate = Keyboard.GetState();
-			if (_keyboardstate.IsKeyUp(_lastKey) && _lastKey != Keys.None)
-			{
-				_newInput?.Invoke(this, new NewEventInput(Input.None));
-			}
+        /// <summary>
+        /// Checks if the right mouse button was clicked.
+        /// </summary>
+        public static bool MouseRightClicked()
+        {
+            if (mouseState.RightButton == ButtonState.Pressed && lastMouseState.RightButton == ButtonState.Released)
+                return true;
+            else
+                return false;
+        }
 
-			CheckKeyState(Keys.Left, Input.Left);
-			CheckKeyState(Keys.Right, Input.Right);
+        /// <summary>
+        /// Gets mouse coordinates adjusted for virtual resolution and camera position.
+        /// </summary>
+        public static Vector2 MousePositionCamera()
+        {
+            Vector2 mousePosition = Vector2.Zero;
+            mousePosition.X = mouseState.X;
+            mousePosition.Y = mouseState.Y;
 
-			if (!Game1.SideScroller)
-			{
-				CheckKeyState(Keys.Up, Input.Up);
-				CheckKeyState(Keys.Down, Input.Down);
-			}
+            return ScreenToWorld(mousePosition);
+        }
 
-			_lastKeyboardState = _keyboardstate;
-		}
+        /// <summary>
+        /// Gets the last mouse coordinates adjusted for virtual resolution and camera position.
+        /// </summary>
+        public static Vector2 LastMousePositionCamera()
+        {
+            Vector2 mousePosition = Vector2.Zero;
+            mousePosition.X = lastMouseState.X;
+            mousePosition.Y = lastMouseState.Y;
 
-		private void CheckKeyState(Keys keys, Input newInput)
-		{
-			if (_keyboardstate.IsKeyDown(keys))
-			{
-				if(!ThrottleInput || (ThrottleInput && _lastKeyboardState.IsKeyUp(keys)))
-				{
-					if(_newInput != null)
-					{
-						_newInput(this, new NewEventInput(newInput));
-						_lastKey = keys;
-					}
-				}
-			}
-		}
-	}
+            return ScreenToWorld(mousePosition);
+        }
+
+        /// <summary>
+        /// Takes screen coordinates (2D position like where the mouse is on screen) then converts it to world position (where we clicked at in the world). 
+        /// </summary>
+        private static Vector2 ScreenToWorld(Vector2 input)
+        {
+            input.X -= ManageResolution.VirtualViewportX;
+            input.Y -= ManageResolution.VirtualViewportY;
+
+            return Vector2.Transform(input, Matrix.Invert(Camera.GetTransformMatrix()));
+        }
+    }
 }

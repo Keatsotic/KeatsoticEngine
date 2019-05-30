@@ -12,16 +12,19 @@ namespace KeatsoticEngine.Source.Map
 		public int XPos { get; set; }
 		public int YPos { get; set; }
 
-		public Rectangle Rectangle { get { return new Rectangle(XPos * Tile._tileSize, YPos * Tile._tileSize, Tile._tileSize, Tile._tileSize); } }
+		private int _tileSize = 16;
+
+		public Rectangle Rectangle { get { return new Rectangle(XPos * _tileSize, YPos * _tileSize, _tileSize, _tileSize); } }
 
 		public bool Intersect(Rectangle rectangle)
 		{
 			return Rectangle.Intersects(rectangle);
 		}
 
-		public TileCollision()
+		public TileCollision(int x, int y)
 		{
-
+			XPos = x;
+			YPos = y;
 		}
 	}
 }

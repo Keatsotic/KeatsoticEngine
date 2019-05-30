@@ -10,14 +10,21 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\packages\MonoGame.Extended.Content.Pipeline.1.1.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
-#begin test_map.xml
-/copy:test_map.xml
-
-#begin test_map_collision.xml
-/copy:test_map_collision.xml
+#begin Textures/s_pixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/s_pixel.png
 
 #begin Textures/s_player_atlas.png
 /importer:TextureImporter
@@ -31,7 +38,12 @@
 /processorParam:TextureFormat=Color
 /build:Textures/s_player_atlas.png
 
-#begin Tilesets/t_overworld_TEMP.png
+#begin Tilesets/m_level_1.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Tilesets/m_level_1.tmx
+
+#begin Tilesets/Tilesets/t_level_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -41,5 +53,17 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Tilesets/t_overworld_TEMP.png
+/build:Tilesets/Tilesets/t_level_01.png
+
+#begin Tilesets/Tilesets/t_overworld.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tilesets/Tilesets/t_overworld.png
 
