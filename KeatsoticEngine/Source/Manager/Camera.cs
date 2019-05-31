@@ -31,7 +31,7 @@ namespace KeatsoticEngine.Source
 			zoom = 1.0f;
 			rotation = 0.0f;
 			//Start the camera at the center of the screen:
-			position = new Vector2(ManageResolution.VirtualWidth / 2, ManageResolution.VirtualHeight / 2);
+			position =  new Vector2(ManageResolution.VirtualWidth / 2, ManageResolution.VirtualHeight / 2);
 			Camera.cameraOffset = new Vector2(ManageResolution.VirtualWidth / 2, ManageResolution.VirtualHeight / 2);
 		}
 

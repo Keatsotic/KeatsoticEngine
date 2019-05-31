@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KeatsoticEngine.Source
+namespace KeatsoticEngine.Source.World
 {
 	abstract class Component
 	{
 		private GameObject _gameObject;
+
 		public abstract ComponentType ComponentType { get; }
 
 		public void Initialize(GameObject gameObject)
@@ -18,9 +19,9 @@ namespace KeatsoticEngine.Source
 			_gameObject = gameObject;
 		}
 
-		public int GetOwnerId()
+		public string GetOwnerId()
 		{
-			return _gameObject.Id;
+			return _gameObject.Tag;
 		}
 
 		public void Remove()

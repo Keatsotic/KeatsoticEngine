@@ -4,7 +4,10 @@
 	SpriteRenderer,
 	PlayerController,
 	Animation,
-	Collision
+	Collision,
+
+	EnemyBase,
+	EnemyMoveAI
 }
 
 public enum Input
@@ -39,8 +42,17 @@ public enum State
 
 	//player only states:
 	Fall,
+	WallAttack,
 	Special,
 	Duck,
 	DuckAttack,
 	WallJump
+}
+
+public enum PatrolType
+{
+	WallPatrol,
+	PlatformPatrol,
+	Follow,
+	SlowFollow
 }

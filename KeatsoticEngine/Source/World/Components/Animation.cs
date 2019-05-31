@@ -57,33 +57,16 @@ namespace KeatsoticEngine.Source.World.Components
 
 			if (_counter > 50)
 			{
-				switch (owner.CurrentState)
+				if (owner.CurrentState.ToString().Contains("Attack"))
 				{
-					case State.Idle:
-						objectAnimated.Play("Idle");
-						_counter = 0;
-						break;
-					case State.Walk:
-						objectAnimated.Play("Walk");
-						_counter = 0;
-						break;
-					case State.Jump:
-						_counter = 0;
-						objectAnimated.Play("Jump");
-						break;
-					case State.Fall:
-						_counter = 0;
-						objectAnimated.Play("Fall");
-						break;
-					case State.Duck:
-						_counter = 0;
-						objectAnimated.Play("Duck");
-						break;
-					case State.Attack:
-						_counter = 0;
-						objectAnimated.Play("Attack", ()=> owner.CurrentState = State.Idle);
-						break;
+					objectAnimated.Play(owner.CurrentState.ToString(), ()=> owner.CurrentState = owner.ReturnState);
+				} else 
+				{ 
+					objectAnimated.Play(owner.CurrentState.ToString()); 
 				}
+
+				_counter = 0;
+
 				ChangeDirection();
 			}
 			objectAnimated.Update(gameTime);

@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using KeatsoticEngine.Source.Data;
 using System.Collections.Generic;
+using KeatsoticEngine.Source.World;
+using KeatsoticEngine.Source.Screens;
 
 namespace KeatsoticEngine
 {
@@ -15,12 +17,9 @@ namespace KeatsoticEngine
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-		public static readonly bool SideScroller = true;
-		public static readonly int Scale = 1;
-		public static int RoomNumber = 1;
+		public static bool SideScroller = true;
 
-		private GameObject _player;
-		private ManageMap _manageMap;
+		private ManageScreens _manageScreens;
 
         public Game1()
         {
@@ -30,42 +29,27 @@ namespace KeatsoticEngine
 			ManageResolution.Init(ref graphics);
 			ManageResolution.SetVirtualResolution(480, 270);
 			ManageResolution.SetResolution(1920, 1080, false);
-			
-			_player = new GameObject();
-			_manageMap = new ManageMap("m_level_1", graphics);
         }
 
 
         protected override void Initialize()
         {
 			// TODO: Add your initialization logic here
+
 			Camera.Initialize();
 			base.Initialize();
         }
 
         protected override void LoadContent()
         {
+			// TODO: use this.Content to load your game content here
+
 			spriteBatch = new SpriteBatch(GraphicsDevice);
-			_manageMap.LoadContent(Content);
-			_player.AddComponent(new Transform(new Vector2(100.0f, 100.0f)));
-			_player.AddComponent(new SpriteRenderer(Content.Load<Texture2D>("Textures/s_player_atlas"), 54, 35));
-			_player.AddComponent(new PlayerController());
-			_player.AddComponent(new Animation(Content.Load<Texture2D>("Textures/s_player_atlas"), (new SpriteSheetData
-			(
-				54,
-				35,
-				(new List<string> { "Idle", "Walk", "Jump", "Fall", "Duck", "Attack" }),
-				(new List<int[]> { new[] { 0 }, new[] { 1, 2, 3, 4, 5, 6 }, new[] { 7 }, new[] { 8 }, new[] { 9 }, new[] { 10, 11, 12 } }),
-				(new List<float> { 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.1f }),
-				(new List<bool> { true, true, true, true, true, false }
+			_manageScreens = new ManageScreens(Content, graphics);
+			_manageScreens.LoadNewScreen(new ScreenStart(_manageScreens));
+		}
 
-			)))));
-			_player.AddComponent(new Collision(_manageMap, new Rectangle(0, 0, 13, 24), new Vector2(20, 11), Content.Load<Texture2D>("Textures/s_pixel")));
-
-            // TODO: use this.Content to load your game content here
-        }
-
-        protected override void UnloadContent()
+		protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
         }
@@ -76,11 +60,8 @@ namespace KeatsoticEngine
                 Exit();
 
 			// TODO: Add your update logic here
-			_manageMap.Update(gameTime);
-			_player.Update(gameTime);
-
-			UpdateCamera();
-
+			_manageScreens.Update(gameTime);
+			ManageInput.Update();
 			base.Update(gameTime);
         }
 
@@ -89,6 +70,7 @@ namespace KeatsoticEngine
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
 			// TODO: Add your drawing code here
+
 			ManageResolution.BeginDraw();
 			spriteBatch.Begin(SpriteSortMode.BackToFront,
 								BlendState.AlphaBlend, 
@@ -97,18 +79,9 @@ namespace KeatsoticEngine
 								null, 
 								null, 
 								Camera.GetTransformMatrix());
-
-			_manageMap.Draw(spriteBatch);
-			_player.Draw(spriteBatch);
-
+			_manageScreens.Draw(spriteBatch);
 			spriteBatch.End();
             base.Draw(gameTime);
         }
-
-		//camera methods
-		private void UpdateCamera()
-		{			
-			Camera.Update(_player.GetComponent<Transform>(ComponentType.Transform).Position);
-		}
 	}
 }

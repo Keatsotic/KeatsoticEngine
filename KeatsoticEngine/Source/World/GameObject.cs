@@ -6,15 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KeatsoticEngine.Source
+namespace KeatsoticEngine.Source.World
 {
 	class GameObject
 	{
-		public int Id { get; set; }
+		public string Tag { get; private set; }
 		private readonly List<Component> _components;
 
-		public GameObject()
+		public GameObject(string tag)
 		{
+			Tag = tag;
 			_components = new List<Component>();
 		}
 

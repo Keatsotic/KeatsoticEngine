@@ -45,7 +45,7 @@ namespace KeatsoticEngine.Source.Manager
 			var tiledMapInteractLayer = _tiledMap.GetLayer<TiledMapTileLayer>("Interact");
 
 			//access object layer in map
-			var _objectLayer = _tiledMap.GetLayer<TiledMapObjectLayer>("Room_" + Game1.RoomNumber);
+			var _objectLayer = _tiledMap.GetLayer<TiledMapObjectLayer>("Room_" + 1);
 
 			if (_objectLayer != null)
 			{

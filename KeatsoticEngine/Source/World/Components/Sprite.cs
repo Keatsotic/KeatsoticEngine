@@ -31,7 +31,7 @@ namespace KeatsoticEngine.Source.World.Components
 
 			if (animation == null)
 			{ 
-				spriteBatch.Draw(Texture, new Rectangle((int)transform.Position.X, (int)transform.Position.Y, Width * Game1.Scale, Height * Game1.Scale),
+				spriteBatch.Draw(Texture, new Rectangle((int)transform.Position.X, (int)transform.Position.Y, Width, Height),
 					Color.White);
 			}
 		}

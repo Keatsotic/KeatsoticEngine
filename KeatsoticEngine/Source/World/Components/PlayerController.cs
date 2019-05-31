@@ -1,34 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KeatsoticEngine.Source.Manager;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace KeatsoticEngine.Source.World.Components
 {
 	class PlayerController : Component
 	{
-		private readonly float _speed = 3.0f;
+		private readonly float _speed = 2f;
 		private readonly int _jumpHeight = 6;
 		private bool _isJumping;
+		private int _wallDir;
+		private readonly int _attackTimerMax = 10;
+		private int _attackTimer;
 
 		public Direction Direction { get; private set; }
 		public State CurrentState { get; set; }
+		public State ReturnState { get; private set; }
 
-		//player controls
-		private bool _playerLeft;
-		private bool _playerRight;
-		private bool _playerUp;
-		private bool _playerDown;
-		private bool _playerJump;
-		private bool _playerJumpCancel;
-		private bool _playerAttack;
-		private bool _playerMenu;
-		private bool _playerSpecial;
 
 
 		public override ComponentType ComponentType => ComponentType.PlayerController;
@@ -39,20 +26,35 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public override void Update(GameTime gameTime)
 		{
-			PlayerInput();
-
+			 
+			//access components
+			var sprite = GetComponent<SpriteRenderer>(ComponentType.SpriteRenderer);
 			var transform = GetComponent<Transform>(ComponentType.Transform);
 			var collision = GetComponent<Collision>(ComponentType.Collision);
 			if (transform == null)
 				return;
 
+			Camera.Update(new Vector2(GetComponent<Transform>(ComponentType.Transform).Position.X + sprite.Width/2,
+								  GetComponent<Transform>(ComponentType.Transform).Position.Y));
+
 			StateMachine(CurrentState, transform, collision);
 
-			if (_playerAttack)
+			if (ManageInput.playerAttack && _attackTimer <= 0)
 			{
-				CurrentState = State.Attack;
+				switch(CurrentState)
+				{
+					case State.Duck:
+						CurrentState = State.DuckAttack;
+						break;
+					case State.WallJump:
+						CurrentState = State.WallAttack;
+						break;
+					default:
+						CurrentState = State.Attack;
+						break;
+				}
 			}
-
+			_attackTimer--;
 		}
 		public override void Draw(SpriteBatch spriteBatch)
 		{ }
@@ -64,25 +66,28 @@ namespace KeatsoticEngine.Source.World.Components
 			switch (currentState)
 			{
 				case State.Idle:
-					Idle(transform);
+					Idle(transform, collision);
 					break;
 				case State.Walk:
 					Walk(transform);
 					break;
 				case State.Jump:
-					Jump(transform);
+					Jump(transform, collision);
 					break;
 				case State.WallJump:
-					//WallJump();
+					WallJump(transform, collision);
 					break;
 				case State.Fall:
-					Fall(transform);
+					Fall(transform, collision);
 					break;
 				case State.Attack:
 					Attack(transform);
 					break;
 				case State.DuckAttack:
-					//DuckAttack();
+					DuckAttack(transform, collision);
+					break;
+				case State.WallAttack:
+					WallAttack(transform, collision);
 					break;
 				case State.Duck:
 					Duck(collision);
@@ -99,22 +104,22 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 		}
 
-		private void Idle(Transform transform)
+		private void Idle(Transform transform, Collision collision)
 		{
 			//switch to walk
-			if (_playerLeft || _playerRight)
+			if (ManageInput.playerLeft || ManageInput.playerRight)
 			{
 				CurrentState = State.Walk;
 			}
 			//switch to jump
-			if (_playerJump && transform.IsOnGround)
+			if (ManageInput.playerJump && transform.IsOnGround)
 			{
 				transform.Velocity.Y = 0;
 				_isJumping = true;
 				CurrentState = State.Jump;
 			}
 			//switch to duck
-			if (_playerDown)
+			if (ManageInput.playerDown)
 			{
 				CurrentState = State.Duck;
 			}
@@ -127,12 +132,12 @@ namespace KeatsoticEngine.Source.World.Components
 
 		private void Walk(Transform transform)
 		{
-			if (_playerLeft)
+			if (ManageInput.playerLeft)
 			{
 				transform.Move(-_speed, transform.Velocity.Y);
 				Direction = Direction.Left;
 			}
-			if (_playerRight)
+			if (ManageInput.playerRight)
 			{
 				transform.Move(_speed, transform.Velocity.Y);
 				Direction = Direction.Right;
@@ -144,80 +149,109 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 
 			//check to see if we are moving
-			if (!_playerLeft && !_playerRight)
+			if (!ManageInput.playerLeft && !ManageInput.playerRight)
 			{
 				CurrentState = State.Idle;
 			}
 
 			//switch to jump
-			if (_playerJump && transform.IsOnGround)
+			if (ManageInput.playerJump && transform.IsOnGround)
 			{
 				transform.Velocity.Y = 0;
 				CurrentState = State.Jump;
 			}
 		}
 
-		private void Jump(Transform transform)
+		private void Jump(Transform transform, Collision collision)
 		{
 			if(_isJumping)
 			{
 				transform.Velocity = new Vector2(transform.Velocity.X, -_jumpHeight);
 				_isJumping = false;
 			}
-			if (_playerJumpCancel)
+			if (ManageInput.playerJumpCancel)
 			{
 				transform.Velocity = new Vector2(transform.Velocity.X, -1);
 				CurrentState = State.Fall;
 			}
 
-			if (transform.Velocity.Y > 0)
+			if (transform.Velocity.Y >= 0 || transform.CheckCeiling(collision))
 			{
+				transform.Velocity.Y = 0;
 				CurrentState = State.Fall;
-
 			}
 
-			if (_playerLeft)
+			if (ManageInput.playerLeft)
 			{
 				transform.Move(-_speed, transform.Velocity.Y);
 				Direction = Direction.Left;
 			}
-			if (_playerRight)
+			if (ManageInput.playerRight)
 			{
 				transform.Move(_speed, transform.Velocity.Y);
 				Direction = Direction.Right;
 			}
+
 		}
 
-		private void Fall(Transform transform)
+		private void Fall(Transform transform, Collision collision)
 		{
-			if (transform.IsOnGround == true)
+			if (transform.IsOnGround)
 			{
 				CurrentState = State.Idle;
 				_isJumping = true;
 			}
 
-			if (_playerLeft)
+			if (ManageInput.playerLeft)
 			{
 				transform.Move(-_speed, transform.Velocity.Y);
 				Direction = Direction.Left;
 			}
-			if (_playerRight)
+			if (ManageInput.playerRight)
 			{
 				transform.Move(_speed, transform.Velocity.Y);
 				Direction = Direction.Right;
+			}
+
+			//walljump
+			if (transform.CheckWall(collision) != 0 && (ManageInput.playerLeft || ManageInput.playerRight) && !transform.IsOnGround)
+			{
+				if ((Direction == Direction.Right && transform.CheckWall(collision) == 1) ||
+				(Direction == Direction.Left && transform.CheckWall(collision) == -1))
+				{
+					_wallDir = -transform.CheckWall(collision);
+					CurrentState = State.WallJump;
+					transform.Velocity.Y = 0;
+				}
+			}
+		}
+
+		private void Duck(Collision collision)
+		{
+			ReturnState = State.Duck;
+
+			collision.BoundingBoxSetter = new Rectangle(21, 17, 13, 18);
+
+			if (!ManageInput.playerDown)
+			{
+				collision.BoundingBoxSetter = new Rectangle(21, 11, 13, 24);
+				CurrentState = State.Idle;
 			}
 		}
 
 		private void Attack(Transform transform)
 		{
+			ReturnState = State.Idle;
+			_attackTimer = _attackTimerMax;
+
 			if (!transform.IsOnGround)
 			{
-				if (_playerLeft)
+				if (ManageInput.playerLeft)
 				{
 					transform.Move(-_speed, transform.Velocity.Y);
 					Direction = Direction.Left;
 				}
-				if (_playerRight)
+				if (ManageInput.playerRight)
 				{
 					transform.Move(_speed, transform.Velocity.Y);
 					Direction = Direction.Right;
@@ -228,40 +262,59 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 		}
 
-		private void Duck(Collision collision)
+		private void DuckAttack(Transform transform, Collision collision)
+		{
+			_attackTimer = _attackTimerMax;
+		}
+
+		private void WallAttack(Transform transform, Collision collision)
 		{
 
-			collision.BoundingBoxSetter = new Rectangle(20, 17, 13, 18);
+			ReturnState = State.WallJump;
+			_attackTimer = _attackTimerMax;
+			transform.Velocity.Y -= 0.4f;
+			_isJumping = true;
+		}
 
-			if (!_playerDown)
+		private void WallJump(Transform transform, Collision collision)
+		{
+			transform.Velocity.Y -= 0.4f;
+			_isJumping = true;
+
+			if ((Direction == Direction.Right && transform.CheckWall(collision) != 1) ||
+				(Direction == Direction.Left && transform.CheckWall(collision) != -1))
 			{
-				collision.BoundingBoxSetter = new Rectangle(20, 11, 13, 24);
+				CurrentState = State.Fall;
+			}
+
+			if (ManageInput.playerJump)
+			{
+				transform.Velocity = Vector2.Zero;
+				transform.Velocity = new Vector2( 2 * _wallDir, 5f);
+				CurrentState = State.Jump;
+
+				Direction = Direction == Direction.Right ? Direction.Left : Direction.Right;
+			}
+
+			if ((!ManageInput.playerLeft && !ManageInput.playerRight) || (transform.CheckWall(collision) == _wallDir) || (transform.CheckWall(collision) == 0))
+			{
+				CurrentState = State.Fall;
+			}
+
+			if (transform.IsOnGround)
+			{
 				CurrentState = State.Idle;
 			}
 		}
 
-		//controller inputs
+		private void Hurt(Transform transform)
+		{ }
 
-		private void PlayerInput()
-		{
-			ManageInput.Update();
+		private void Dead(Transform transform)
+		{ }
 
-			// check for directional movement
-			_playerLeft = ManageInput.IsKeyDown(Keys.Left) == true || GamePad.GetState(PlayerIndex.One).DPad.Left == ButtonState.Pressed;
-			_playerRight = ManageInput.IsKeyDown(Keys.Right) == true || GamePad.GetState(PlayerIndex.One).DPad.Right == ButtonState.Pressed;
-
-			_playerUp = ManageInput.IsKeyDown(Keys.Up) == true || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed;
-			_playerDown = ManageInput.IsKeyDown(Keys.Down) == true || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed;
-
-
-			//check for button presses
-			_playerAttack = ManageInput.KeyPressed(Keys.V) == true || GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed;
-			_playerJump = ManageInput.KeyPressed(Keys.Space) == true || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed;
-			_playerJumpCancel = ManageInput.IsKeyUp(Keys.Space) == true || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed;
-
-			_playerSpecial = ManageInput.KeyPressed(Keys.B) == true || GamePad.GetState(PlayerIndex.One).Buttons.Y == ButtonState.Pressed;
-			_playerMenu = ManageInput.KeyPressed(Keys.Enter) == true || GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed;
-		}
 	}
 	#endregion
+
+
 }

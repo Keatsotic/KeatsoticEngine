@@ -47,18 +47,26 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Data\SpriteSheetData.cs" />
-    <Compile Include="Source\Data\XMLSerialization.cs" />
     <Compile Include="Source\Manager\ManageInput.cs" />
-    <Compile Include="Source\World\Camera.cs" />
+    <Compile Include="Source\Manager\Camera.cs" />
     <Compile Include="Source\Manager\ManageMap.cs" />
     <Compile Include="Source\Manager\ManageResolution.cs" />
+    <Compile Include="Source\Manager\ManageScreens.cs" />
+    <Compile Include="Source\Map\EnemySpawn.cs" />
+    <Compile Include="Source\Map\ObjectSpawn.cs" />
     <Compile Include="Source\Map\TileCollision.cs" />
+    <Compile Include="Source\Screens\Screen.cs" />
+    <Compile Include="Source\Screens\ScreenStart.cs" />
+    <Compile Include="Source\Screens\ScreenWorld.cs" />
     <Compile Include="Source\World\Component.cs" />
     <Compile Include="Source\World\Components\Animation.cs" />
     <Compile Include="Source\World\Components\Collision.cs" />
+    <Compile Include="Source\World\Components\Enemy\EnemyBase.cs" />
+    <Compile Include="Source\World\Components\Enemy\EnemyMoveAI.cs" />
     <Compile Include="Source\World\Components\PlayerController.cs" />
     <Compile Include="Source\World\Components\Sprite.cs" />
     <Compile Include="Source\World\Components\Transform.cs" />
+    <Compile Include="Source\World\Entities.cs" />
     <Compile Include="Source\World\GameObject.cs" />
   </ItemGroup>
   <ItemGroup>
