@@ -15,8 +15,8 @@ namespace KeatsoticEngine.Source.World.Components
 		private Rectangle _boundingBoxPre; 
 		private Vector2 _offset;
 		public Rectangle BoundingBoxSetter { get; set; }
-		public Rectangle NewBoundingBox { get { return BoundingBoxSetter; } }
-		private Texture2D _bbTexture;
+		public Rectangle CollisionBoundingBox { get; private set; }
+		public Texture2D _bbTexture;
 		private Color bbColor = new Color(Color.Red, 0);
 
 		public override ComponentType ComponentType => ComponentType.Collision;
@@ -28,30 +28,37 @@ namespace KeatsoticEngine.Source.World.Components
 			_offset = offset;
 			_bbTexture = bbTexture;
 			BoundingBoxSetter = new Rectangle((int)(_boundingBoxPre.X + _offset.X), 
-											  (int)(_boundingBoxPre.Y + offset.Y), 
+											  (int)(_boundingBoxPre.Y + _offset.Y), 
 											  _boundingBoxPre.Width, 
 											  _boundingBoxPre.Height);
 		}
+
 
 		public bool CheckCollision(Rectangle rectangle, bool fixBox = true)
 		{
 			return _manageMap.CheckCollision(rectangle);
 		}
 
+		public bool CheckCollisionDoor(Rectangle rectangle, bool fixBox = true)
+		{
+			return _manageMap.CheckCollisionDoor(rectangle);
+		}
+
 		public override void Update(GameTime gameTime)
 		{
-
+			var transform = GetComponent<Transform>(ComponentType.Transform);
+			CollisionBoundingBox = new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+												 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+												 BoundingBoxSetter.Width,
+												BoundingBoxSetter.Height);
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
 #if DEBUG
 			var transform = GetComponent<Transform>(ComponentType.Transform);
-			var drawRect = new Rectangle((int)(NewBoundingBox.X + transform.Position.X), 
-										 (int)(NewBoundingBox.Y + transform.Position.Y), 
-										 NewBoundingBox.Width, 
-										 NewBoundingBox.Height);
-			spriteBatch.Draw(_bbTexture, drawRect, new Color(112,111,111,3));
+			
+			spriteBatch.Draw(_bbTexture, CollisionBoundingBox, new Color(112,111,111,3));
 #endif
 		}
 
@@ -98,6 +105,20 @@ namespace KeatsoticEngine.Source.World.Components
 				_vspd = 0;
 			}
 			transform.Position.Y += _vspd;
+
+
+			var owner = GetOwnerId();
+
+			if (owner == "Player")
+			{
+				if (CheckCollisionDoor(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+													 BoundingBoxSetter.Width,
+													 BoundingBoxSetter.Height)))
+				{
+					System.Diagnostics.Debug.WriteLine("found the door");
+				}
+			}
 		}
 	}
 }

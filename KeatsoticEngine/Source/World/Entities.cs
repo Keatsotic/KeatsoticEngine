@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KeatsoticEngine.Source.World
 {
-	class Entities
+	public class Entities
 	{
 		private List<GameObject> _entities;
 
@@ -18,19 +18,19 @@ namespace KeatsoticEngine.Source.World
 			_entities = new List<GameObject>();
 		}
 
-		public void CreatePlayer(Vector2 position)
-		{
-			
-		}
-
 		public void AddEntities(GameObject newEntity)
 		{
 			_entities.Add(newEntity);
 		}
 
+		public void RemoveEntities(GameObject destroyEntity)
+		{
+			_entities.Remove(destroyEntity);
+		}
+
 		public void Update(GameTime gameTime)
 		{
-			foreach (var gameObject in _entities)
+			foreach (var gameObject in _entities.ToList())
 			{
 				gameObject.Update(gameTime);
 			}
@@ -38,10 +38,48 @@ namespace KeatsoticEngine.Source.World
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
-			foreach(var gameObject in _entities)
+			foreach(var gameObject in _entities.ToList())
 			{
 				gameObject.Draw(spriteBatch);
 			}
+		}
+
+		public bool CheckCollision(Rectangle rectangle, GameObject owner, out Direction direction, out GameObject objectHit)
+		{
+			foreach (var gameObject in _entities)
+			{
+				var collision = gameObject.GetComponent<Collision>(ComponentType.Collision);
+				if (gameObject == owner || collision == null)
+					continue;
+
+
+				if (collision.CollisionBoundingBox.Intersects(rectangle))
+				{
+					if (owner.Id == "Player")
+					{
+						if (gameObject.GetComponent<Collision>(ComponentType.Collision).CollisionBoundingBox.X > rectangle.X)
+						{
+							direction = Direction.Right;
+						}
+						else
+						{
+							direction = Direction.Left;
+						}
+						objectHit = gameObject;
+						return true;
+					}
+					else if ((owner.Id != gameObject.Id) && (owner.Id == "Damage"))
+					{
+						direction = Direction.None;
+						objectHit = gameObject;
+						return true;
+					}
+				}
+
+			}
+			direction = Direction.None;
+			objectHit = null;
+			return false;
 		}
 	}
 }

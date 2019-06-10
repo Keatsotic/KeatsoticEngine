@@ -18,8 +18,9 @@ namespace KeatsoticEngine.Source.Screens
 	{
 		private Texture2D _texture;
 
-		public AnimatedSprite objectAnimated { get; private set; }
-		public AnimatedSprite objectSprite { get; private set; }
+		public AnimatedSprite ObjectAnimated { get; private set; }
+		public AnimatedSprite ObjectSprite { get; private set; }
+		private bool _canPressStart;
 
 		public ScreenStart(ManageScreens manageScreens) : base(manageScreens)
 		{
@@ -40,11 +41,11 @@ namespace KeatsoticEngine.Source.Screens
 			animationFactory.Add("Fade", new SpriteSheetAnimationData(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0.3f, false));
 			animationFactory.Add("StartScreen", new SpriteSheetAnimationData(new[] { 10, 11, 12, 13 }, 0.3f));
 
-			objectAnimated = new AnimatedSprite(animationFactory, "StartScreen");
-			objectSprite = objectAnimated;
+			ObjectAnimated = new AnimatedSprite(animationFactory, "StartScreen");
+			ObjectSprite = ObjectAnimated;
 
-			objectSprite.Origin = Vector2.Zero;
-			objectAnimated.Play("Fade", () => objectAnimated.Play("StartScreen"));
+			ObjectSprite.Origin = Vector2.Zero;
+			ObjectAnimated.Play("Fade", () => _canPressStart = true);
 		}
 
 		public override void Initialize()
@@ -55,17 +56,21 @@ namespace KeatsoticEngine.Source.Screens
 		public override void Update(GameTime gameTime)
 		{
 			Camera.Update(Vector2.Zero);
-			objectAnimated.Update(gameTime);
+			ObjectAnimated.Update(gameTime);
 
-			if (ManageInput.playerStart)
+			if (_canPressStart)
 			{
-				ManageScreens.LoadNewScreen(new ScreenWorld(ManageScreens));
+				ObjectAnimated.Play("StartScreen");
+				if (ManageInput.playerStart)
+				{
+					ManageScreens.LoadNewScreen(new ScreenWorld(ManageScreens));
+				}
 			}
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			spriteBatch.Draw(objectSprite);
+			spriteBatch.Draw(ObjectSprite);
 		}
 	}
 }

@@ -8,6 +8,7 @@ using KeatsoticEngine.Source.Data;
 using System.Collections.Generic;
 using KeatsoticEngine.Source.World;
 using KeatsoticEngine.Source.Screens;
+using System;
 
 namespace KeatsoticEngine
 {
@@ -19,6 +20,9 @@ namespace KeatsoticEngine
 
 		public static bool SideScroller = true;
 
+		private int _fpsCounter;
+		private TimeSpan _counterElapsed = TimeSpan.Zero;
+
 		private ManageScreens _manageScreens;
 
         public Game1()
@@ -29,6 +33,8 @@ namespace KeatsoticEngine
 			ManageResolution.Init(ref graphics);
 			ManageResolution.SetVirtualResolution(480, 270);
 			ManageResolution.SetResolution(1920, 1080, false);
+
+			//IsFixedTimeStep = false;
         }
 
 
@@ -56,8 +62,8 @@ namespace KeatsoticEngine
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+			{ Exit(); }
 
 			// TODO: Add your update logic here
 			_manageScreens.Update(gameTime);
@@ -68,6 +74,19 @@ namespace KeatsoticEngine
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
+			_fpsCounter++;
+			_counterElapsed += gameTime.ElapsedGameTime;
+
+			if (_counterElapsed >= TimeSpan.FromSeconds(1))
+			{
+#if DEBUG
+				Window.Title = "FULL MOON " + _fpsCounter.ToString() + "fps - " + 
+								(GC.GetTotalMemory(false) / 1048576f).ToString("F") + "MB"; 
+#endif
+				_fpsCounter = 0;
+				_counterElapsed -= TimeSpan.FromSeconds(1);
+			}
 
 			// TODO: Add your drawing code here
 
@@ -81,7 +100,8 @@ namespace KeatsoticEngine
 								Camera.GetTransformMatrix());
 			_manageScreens.Draw(spriteBatch);
 			spriteBatch.End();
-            base.Draw(gameTime);
+			HUD.Draw(spriteBatch);
+			base.Draw(gameTime);
         }
 	}
 }

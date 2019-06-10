@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="300" height="70" tilewidth="16" tileheight="16" infinite="0" nextlayerid="51" nextobjectid="65">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="300" height="70" tilewidth="16" tileheight="16" infinite="0" nextlayerid="51" nextobjectid="78">
  <tileset firstgid="1" name="t_level_01" tilewidth="16" tileheight="16" tilecount="256" columns="16">
   <image source="Tilesets/t_level_01.png" trans="ffffff" width="256" height="256"/>
  </tileset>
@@ -596,49 +596,48 @@
 </data>
  </layer>
  <objectgroup id="3" name="Room_1">
-  <object id="3" name="cameraMin" type="Camera" x="0" y="400">
+  <object id="3" name="cameraMin" type="Camera" x="16" y="400">
    <point/>
   </object>
   <object id="4" name="cameraMax" type="Camera" x="1456" y="656">
    <point/>
   </object>
-  <object id="23" name="2" type="Door" x="1456" y="416" width="16" height="272"/>
-  <object id="24" name="Overworld" type="Door" x="16" y="400" width="16" height="272"/>
-  <object id="39" name="PlayerStart" type="Player" x="256" y="576">
+  <object id="39" name="PlayerStart" type="Player" x="176" y="512">
    <point/>
   </object>
-  <object id="55" name="Enemy" type="Enemy" x="672" y="512">
+  <object id="55" name="Crawler" type="Enemy" x="672" y="512">
    <point/>
   </object>
-  <object id="56" name="Enemy" type="Enemy" x="896" y="544">
+  <object id="56" name="Crawler" type="Enemy" x="896" y="544">
    <point/>
   </object>
-  <object id="57" name="Enemy" type="Enemy" x="992" y="512">
+  <object id="57" name="Crawler" type="Enemy" x="992" y="512">
    <point/>
   </object>
-  <object id="58" name="Enemy" type="Enemy" x="768" y="480">
+  <object id="58" name="Crawler" type="Enemy" x="768" y="480">
    <point/>
   </object>
-  <object id="59" name="Enemy" type="Enemy" x="736" y="560">
+  <object id="59" name="Crawler" type="Enemy" x="736" y="560">
    <point/>
   </object>
-  <object id="60" name="Enemy" type="Enemy" x="1072" y="432">
+  <object id="60" name="Crawler" type="Enemy" x="1072" y="432">
    <point/>
   </object>
-  <object id="63" name="Enemy" type="Enemy" x="400" y="496">
+  <object id="63" name="Crawler" type="Enemy" x="400" y="496">
    <point/>
   </object>
+  <object id="72" name="2" type="Door" x="1456" y="416" width="16" height="272"/>
  </objectgroup>
- <objectgroup id="46" name="Room_2" locked="1">
+ <objectgroup id="46" name="Room_2">
   <object id="35" name="cameraMin" type="Camera" x="1456" y="416">
    <point/>
   </object>
   <object id="36" name="cameraMax" type="Camera" x="1936" y="656">
    <point/>
   </object>
-  <object id="37" name="3" type="Door" x="1648" y="656" width="176" height="16"/>
-  <object id="38" name="1" type="Door" x="1440" y="416" width="16" height="272"/>
-  <object id="40" name="Screen Ref" x="1456" y="656" width="480" height="240"/>
+  <object id="40" name="Screen Ref" x="1456" y="976" width="480" height="240"/>
+  <object id="67" name="1" type="Door" x="1440" y="416" width="16" height="272"/>
+  <object id="74" name="3" type="Door" x="1584" y="640" width="304" height="16"/>
  </objectgroup>
  <objectgroup id="49" name="Room_3">
   <object id="42" name="cameraMin" type="Camera" x="1456" y="656">
@@ -647,7 +646,7 @@
   <object id="43" name="cameraMax" type="Camera" x="1936" y="896">
    <point/>
   </object>
-  <object id="51" name="4" type="Door" x="1936" y="624" width="16" height="112"/>
+  <object id="76" name="4" type="Door" x="1936" y="624" width="16" height="272"/>
  </objectgroup>
  <objectgroup id="50" name="Room_4">
   <object id="47" name="cameraMin" type="Camera" x="1936" y="656">
@@ -656,6 +655,6 @@
   <object id="48" name="cameraMax" type="Camera" x="2416" y="896">
    <point/>
   </object>
-  <object id="52" name="3" type="Door" x="1920" y="624" width="16" height="112"/>
+  <object id="77" name="3" type="Door" x="1920" y="624" width="16" height="272"/>
  </objectgroup>
 </map>

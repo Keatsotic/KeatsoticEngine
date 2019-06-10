@@ -18,8 +18,8 @@ namespace KeatsoticEngine.Source.World.Components
 		public override ComponentType ComponentType => ComponentType.Animation;
 
 		public Rectangle TextureRectangle{ get; set; }
-		public Direction Direction { get; set; }
 		public State CurrentState { get; set; }
+		public bool AnimationFinished { get; private set; }
 		private double _counter;
 		public readonly AnimatedSprite objectAnimated;
 		public readonly Sprite objectSprite;
@@ -45,32 +45,51 @@ namespace KeatsoticEngine.Source.World.Components
 		
 		public override void Update(GameTime gameTime)
 		{
+			AnimationFinished = false;
+			var damage = GetComponent<Damage>(ComponentType.Damage);
 			var transform = GetComponent<Transform>(ComponentType.Transform);
-			var owner = GetComponent<PlayerController>(ComponentType.PlayerController);
 
-			if (owner == null)
-			{
-				//input = GetComponent<ENEMY AI COMPONENT FOR STATE INFO>()
-			}
+			if (transform == null)
+				return;
 
 			_counter += gameTime.ElapsedGameTime.TotalMilliseconds;
 
 			if (_counter > 50)
 			{
-				if (owner.CurrentState.ToString().Contains("Attack"))
+				if (CurrentState.ToString().Contains("Attack") || CurrentState.ToString().Contains("Hurt"))
 				{
-					objectAnimated.Play(owner.CurrentState.ToString(), ()=> owner.CurrentState = owner.ReturnState);
-				} else 
-				{ 
-					objectAnimated.Play(owner.CurrentState.ToString()); 
+					objectAnimated.Play(CurrentState.ToString(), () => AnimationFinished = true);
+				}
+				else
+				{
+					objectAnimated.Play(CurrentState.ToString());
 				}
 
 				_counter = 0;
 
 				ChangeDirection();
 			}
+
 			objectAnimated.Update(gameTime);
 			objectAnimated.Position = transform.Position;
+
+			if (damage == null)
+				return;
+			if (damage.IsInvincible)
+			{
+				if (_counter % 2 == 0)
+				{
+					objectSprite.Color = new Color(0, 0, 0, 0);
+				}
+				else
+				{
+					objectSprite.Color = Color.White;
+				}
+			}
+			else
+			{
+				objectSprite.Color = Color.White;
+			}
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
@@ -81,10 +100,10 @@ namespace KeatsoticEngine.Source.World.Components
 
 		private void ChangeDirection()
 		{
-			var input = GetComponent<PlayerController>(ComponentType.PlayerController);
+			var transform = GetComponent<Transform>(ComponentType.Transform);
 			if (!Game1.SideScroller)
 			{
-				switch (input.Direction)
+				switch (transform.Direction)
 				{
 					case Direction.Up:
 						break;
@@ -100,7 +119,7 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 			else
 			{
-				switch (input.Direction)
+				switch (transform.Direction)
 				{
 					case Direction.Right:
 						objectAnimated.Effect = SpriteEffects.None;

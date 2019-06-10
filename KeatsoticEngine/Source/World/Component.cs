@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KeatsoticEngine.Source.World
 {
-	abstract class Component
+	public abstract class Component
 	{
 		private GameObject _gameObject;
 
@@ -21,7 +21,12 @@ namespace KeatsoticEngine.Source.World
 
 		public string GetOwnerId()
 		{
-			return _gameObject.Tag;
+			return _gameObject.Id;
+		}
+
+		public GameObject GetOwner()
+		{
+			return _gameObject;
 		}
 
 		public void Remove()

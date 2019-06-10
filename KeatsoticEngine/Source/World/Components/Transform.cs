@@ -13,6 +13,7 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public Vector2 Position;
 		public bool IsOnGround { get; set; }
+		public Direction Direction { get; private set; }
 		public int IsOnWall { get; private set; }
 		public Vector2 Velocity = Vector2.Zero;
 		private float _accel;
@@ -58,6 +59,14 @@ namespace KeatsoticEngine.Source.World.Components
 				{
 					Velocity.X = x;
 				}
+				if (x > 0) 
+				{
+					Direction = Direction.Right;
+				}
+				else 
+				{
+					Direction = Direction.Left;
+				}
 			}
 			if (y != 0)
 			{
@@ -66,6 +75,57 @@ namespace KeatsoticEngine.Source.World.Components
 				{
 					Velocity.Y = y;
 				}
+				if (!Game1.SideScroller)
+				{
+					if (y < 0) 
+					{
+						Direction = Direction.Up;
+					}
+					else 
+					{
+						Direction = Direction.Down;
+					}
+				}
+			}
+		}
+
+		//move function for platforms or something
+		public void Move(Direction direction, float x, float y)
+		{
+			switch(direction)
+			{
+				case Direction.Right:
+					Position.X += x;
+					break;
+				case Direction.Left:
+					Position.X -= x;
+					break;
+				case Direction.Up:
+					Position.Y -= y;
+					break;
+				case Direction.Down:
+					Position.Y += y;
+					break;
+			}
+		}
+
+		public void Move(Direction direction, Vector2 knockback)
+		{
+		//directions are reversed
+			switch (direction)
+			{
+				case Direction.Right:
+					Velocity.X = -knockback.X;
+					break;
+				case Direction.Left:
+					Velocity.X = knockback.X;
+					break;
+				case Direction.Up:
+					Velocity.Y = knockback.X;
+					break;
+				case Direction.Down:
+					Velocity.Y = knockback.Y;
+					break;
 			}
 		}
 

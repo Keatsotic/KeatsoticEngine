@@ -5,9 +5,16 @@
 	PlayerController,
 	Animation,
 	Collision,
+	Damage,
 
-	EnemyBase,
-	EnemyMoveAI
+	Equipment,
+	Shuriken,
+
+	Health,
+	EfxGenerator,
+
+	MovementAI,
+	SpawnController
 }
 
 public enum Input
@@ -23,9 +30,10 @@ public enum Input
 }
 
 public enum Direction
-{
+{ 
 	Left,
 	Right,
+	None,
 	Up,
 	Down
 }

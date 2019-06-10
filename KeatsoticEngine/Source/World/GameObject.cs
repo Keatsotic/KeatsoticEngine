@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace KeatsoticEngine.Source.World
 {
-	class GameObject
+	public class GameObject
 	{
-		public string Tag { get; private set; }
+		public string Id { get; set; }
 		private readonly List<Component> _components;
+		protected State CurrentState { get; set; }
 
-		public GameObject(string tag)
+		public GameObject()
 		{
-			Tag = tag;
+			
 			_components = new List<Component>();
 		}
 
@@ -23,6 +24,7 @@ namespace KeatsoticEngine.Source.World
 		{
 			return _components.Find(c => c.ComponentType == componentType) as TComponentType;
 		}
+
 
 		public void AddComponent(Component component)
 		{
@@ -44,7 +46,7 @@ namespace KeatsoticEngine.Source.World
 			_components.Remove(component);
 		}
 
-		public void Update(GameTime gameTime)
+		public virtual void Update(GameTime gameTime)
 		{
 			foreach (var components in _components)
 			{
@@ -52,7 +54,7 @@ namespace KeatsoticEngine.Source.World
 			}
 		}
 
-		public void Draw(SpriteBatch spriteBatch)
+		public virtual void Draw(SpriteBatch spriteBatch)
 		{
 			foreach (var components in _components)
 			{
