@@ -18,6 +18,7 @@ namespace KeatsoticEngine.Source.World.Components
 		public Rectangle CollisionBoundingBox { get; private set; }
 		public Texture2D _bbTexture;
 		private Color bbColor = new Color(Color.Red, 0);
+		private string _roomNumber;
 
 		public override ComponentType ComponentType => ComponentType.Collision;
 
@@ -39,9 +40,9 @@ namespace KeatsoticEngine.Source.World.Components
 			return _manageMap.CheckCollision(rectangle);
 		}
 
-		public bool CheckCollisionDoor(Rectangle rectangle, bool fixBox = true)
+		public Rectangle CheckCollisionDoor(Rectangle rectangle, bool fixBox = true)
 		{
-			return _manageMap.CheckCollisionDoor(rectangle);
+			return _manageMap.CheckCollisionDoor(rectangle, out _roomNumber);
 		}
 
 		public override void Update(GameTime gameTime)
@@ -107,16 +108,46 @@ namespace KeatsoticEngine.Source.World.Components
 			transform.Position.Y += _vspd;
 
 
-			var owner = GetOwnerId();
 
-			if (owner == "Player")
-			{
-				if (CheckCollisionDoor(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+			//check for door if we are the player
+			var owner = GetOwnerId();
+			
+			var doorRect = CheckCollisionDoor(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
 													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
 													 BoundingBoxSetter.Width,
-													 BoundingBoxSetter.Height)))
+													 BoundingBoxSetter.Height));
+
+			if (owner == "Player" && ManageInput.CanPressButtons)
+			{
+				if (_roomNumber != "")
 				{
-					System.Diagnostics.Debug.WriteLine("found the door");
+					if (_roomNumber.Length < 3)
+					{
+						var position = GetComponent<Transform>(ComponentType.Transform).Position;
+						if (position == null)
+							return;
+
+						if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y && position.Y + BoundingBoxSetter.Y >doorRect.Y +doorRect.Height)
+						{
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingDown");
+						}
+						else if (position.X + BoundingBoxSetter.X < doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y)
+						{
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingRight");
+						}
+						else if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y)
+						{
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingLeft");
+						}
+						else if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y < doorRect.Y)
+						{
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingUp");
+						}
+					}
+					else if (_roomNumber.Length > 3)
+					{
+						_manageMap.StartTransition(_roomNumber, "1", "Fading");
+					}
 				}
 			}
 		}

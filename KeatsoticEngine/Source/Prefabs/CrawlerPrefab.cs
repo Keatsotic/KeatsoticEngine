@@ -35,7 +35,7 @@ namespace KeatsoticEngine.Source.Prefabs
 			)))));
 			_enemy.AddComponent(new MoveRandomAI(600, 1));
 			_enemy.AddComponent(new Damage(entities, _enemy));
-			_enemy.AddComponent(new Health(entities, _enemy, 2));
+			_enemy.AddComponent(new Health(entities, _enemy, 2, 2));
 			_enemy.AddComponent(new EfxGenerator(content.Load<Texture2D>("Textures/s_efx")));
 			entities.AddEntities(_enemy);
 			enemyAdded = entities;

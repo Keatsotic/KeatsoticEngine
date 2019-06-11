@@ -49,8 +49,8 @@ namespace KeatsoticEngine.Source.World.Components
 			var damage = GetComponent<Damage>(ComponentType.Damage);
 			var transform = GetComponent<Transform>(ComponentType.Transform);
 
-			if (transform == null)
-				return;
+		if (transform == null)
+			return;
 
 			_counter += gameTime.ElapsedGameTime.TotalMilliseconds;
 
@@ -70,8 +70,11 @@ namespace KeatsoticEngine.Source.World.Components
 				ChangeDirection();
 			}
 
+
 			objectAnimated.Update(gameTime);
+			
 			objectAnimated.Position = transform.Position;
+			
 
 			if (damage == null)
 				return;

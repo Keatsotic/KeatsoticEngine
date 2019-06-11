@@ -23,12 +23,13 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public override ComponentType ComponentType => ComponentType.Transform;
 
-		public Transform(Vector2 position, float acceleration = 0.1f, float friction = 0.2f, float gravity = 0.4f)
+		public Transform(Vector2 position, int direction = 0, float acceleration = 0.1f, float friction = 0.2f, float gravity = 0.4f)
 		{
 			Position = position;
 			_accel = acceleration;
 			_friction = friction;
 			_gravity = gravity;
+			Direction = (Direction)direction;
 			IsOnGround = false;
 		}
 		public override void Update(GameTime gameTime)
@@ -43,6 +44,7 @@ namespace KeatsoticEngine.Source.World.Components
 			IsOnGround = CheckGround(collision);
 			//move the player
 			collision.CollisionManager(Velocity.X, Velocity.Y, this);
+			
 			
 		}
 
@@ -89,7 +91,7 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 		}
 
-		//move function for platforms or something
+		//move function for platforms or transistions
 		public void Move(Direction direction, float x, float y)
 		{
 			switch(direction)
@@ -109,6 +111,7 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 		}
 
+		//knock back movement
 		public void Move(Direction direction, Vector2 knockback)
 		{
 		//directions are reversed
@@ -131,7 +134,7 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public void ApplyGravity()
 		{
-			if (!IsOnGround)
+			if (!IsOnGround && ManageInput.CanPressButtons)
 			{
 				Velocity.Y += _gravity;
 

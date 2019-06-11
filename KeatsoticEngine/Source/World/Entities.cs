@@ -30,9 +30,12 @@ namespace KeatsoticEngine.Source.World
 
 		public void Update(GameTime gameTime)
 		{
-			foreach (var gameObject in _entities.ToList())
+			if (!ManageInput.GamePaused)
 			{
-				gameObject.Update(gameTime);
+				foreach (var gameObject in _entities.ToList())
+				{
+					gameObject.Update(gameTime);
+				}
 			}
 		}
 

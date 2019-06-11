@@ -19,18 +19,19 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public override ComponentType ComponentType => ComponentType.Health;
 
-		public Health(Entities entities, GameObject owner, int maxHealth)
+		public Health(Entities entities, GameObject owner, int maxHealth, int currentHealth)
 		{
 			_entities = entities;
 			_owner = owner;
 			_maxHealth = maxHealth;
-			CurrentHealth = _maxHealth;
+			CurrentHealth = currentHealth;
 		}
 
 		public override void Update(GameTime gameTime)
 		{
 			if (_owner.Id == "Player")
 				return;
+
 			var transform = GetComponent<Transform>(ComponentType.Transform);
 			if (CurrentHealth <= 0)
 			{

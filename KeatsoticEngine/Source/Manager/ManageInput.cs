@@ -7,11 +7,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using KeatsoticEngine.Source.Manager;
 using KeatsoticEngine.Source;
+using KeatsoticEngine.Source.World.Components;
 
 namespace KeatsoticEngine
 { 
     public static class ManageInput 
     {
+		public static bool CanPressButtons { get; set; }
+		public static bool GamePaused { get; private set; }
         private static KeyboardState keyboardState = Keyboard.GetState();
         private static KeyboardState lastKeyboardState;
 
@@ -34,12 +37,20 @@ namespace KeatsoticEngine
 
 		public static void Update()
         {
-            lastKeyboardState = keyboardState;
-            keyboardState = Keyboard.GetState();
+			if (CanPressButtons)
+			{
+				lastKeyboardState = keyboardState;
+				keyboardState = Keyboard.GetState();
 
-            lastMouseState = mouseState;
-            mouseState = Mouse.GetState();
-			PlayerInputsUpdate();
+				lastMouseState = mouseState;
+				mouseState = Mouse.GetState();
+				PlayerInputsUpdate();
+
+				if (playerStart && PlayerController.Player != null)
+				{
+					GamePaused = GamePaused == true ? false : true;
+				}
+			}
         }
 
         /// <summary>

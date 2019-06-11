@@ -62,8 +62,6 @@
     <Compile Include="Source\Screens\Screen.cs" />
     <Compile Include="Source\Screens\ScreenStart.cs" />
     <Compile Include="Source\Screens\ScreenWorld.cs" />
-    <Compile Include="Source\Transitions\TransitionFade.cs" />
-    <Compile Include="Source\Transitions\TransitionSliding.cs" />
     <Compile Include="Source\World\Component.cs" />
     <Compile Include="Source\World\Components\Animation.cs" />
     <Compile Include="Source\World\Components\Collision.cs" />

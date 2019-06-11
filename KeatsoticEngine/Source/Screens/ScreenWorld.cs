@@ -15,12 +15,12 @@ namespace KeatsoticEngine.Source.Screens
 	{
 		private ManageMap _manageMap;
 		private Entities _entities;
-
-
-		public ScreenWorld(ManageScreens manageScreens) : base(manageScreens)
+		private bool _killPlayer;
+		public ScreenWorld(ManageScreens manageScreens, bool killPlayer) : base(manageScreens)
 		{
-			_manageMap = new ManageMap("m_level_1", manageScreens._graphics);
+			_manageMap = new ManageMap(ManageMap.Level, manageScreens._graphics, manageScreens);
 			_entities = new Entities();
+			_killPlayer = killPlayer;
 		}
 
 		public override void Initialize()
@@ -30,15 +30,11 @@ namespace KeatsoticEngine.Source.Screens
 
 		public override void LoadContent(ContentManager content)
 		{
-	
-			_manageMap.LoadMap(_entities, content, out _entities);
-
-			HUD.LoadContent(content);
+			_manageMap.LoadMap(_entities, content, _killPlayer, out _entities);
 		}
 
 		public override void Update(GameTime gameTime)
 		{
-			HUD.Update(gameTime);
 			_manageMap.Update(gameTime);
 			_entities.Update(gameTime);
 		}
@@ -48,5 +44,7 @@ namespace KeatsoticEngine.Source.Screens
 			_manageMap.Draw(spriteBatch);
 			_entities.Draw(spriteBatch);
 		}
+
+
 	}
 }

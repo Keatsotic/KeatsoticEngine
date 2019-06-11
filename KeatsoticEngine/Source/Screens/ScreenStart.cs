@@ -61,9 +61,10 @@ namespace KeatsoticEngine.Source.Screens
 			if (_canPressStart)
 			{
 				ObjectAnimated.Play("StartScreen");
+
 				if (ManageInput.playerStart)
 				{
-					ManageScreens.LoadNewScreen(new ScreenWorld(ManageScreens));
+					ManageScreens.LoadNewScreen(new ScreenWorld(ManageScreens, true), "Fading");
 				}
 			}
 		}

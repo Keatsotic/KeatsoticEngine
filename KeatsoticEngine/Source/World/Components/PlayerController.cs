@@ -28,13 +28,13 @@ namespace KeatsoticEngine.Source.World.Components
 		public State ReturnState { get; private set; }
 
 
-
 		public override ComponentType ComponentType => ComponentType.PlayerController;
 
 		public PlayerController(Entities entities, GameObject owner)
 		{
 			_entities = entities;
 			Player = owner;
+			CurrentState = HUD.PlayerCurrentState;
 		}
 
 		public override void Update(GameTime gameTime)
@@ -48,6 +48,7 @@ namespace KeatsoticEngine.Source.World.Components
 
 			if (transform == null || sprite == null || collision == null) 
 				return;
+
 
 			Camera.Update(new Vector2(GetComponent<Transform>(ComponentType.Transform).Position.X + sprite.Width/2,
 								  GetComponent<Transform>(ComponentType.Transform).Position.Y));
@@ -70,6 +71,7 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 			_attackTimer--;
 
+			
 			StateMachine(CurrentState, transform, collision);
 
 
@@ -165,9 +167,9 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 			if (!transform.IsOnGround)
 			{
-				//transform.Velocity.Y = 0;
 				CurrentState = State.Fall;
 			}
+			
 		}
 
 		private void Walk(Transform transform)
@@ -200,6 +202,7 @@ namespace KeatsoticEngine.Source.World.Components
 			if (ManageInput.playerJump && transform.IsOnGround)
 			{
 				transform.Velocity.Y = 0;
+				_isJumping = true;
 				CurrentState = State.Jump;
 			}
 		}

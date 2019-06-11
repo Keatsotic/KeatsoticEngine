@@ -1,7 +1,9 @@
 ﻿using KeatsoticEngine.Source.Data;
 using KeatsoticEngine.Source.Map;
 using KeatsoticEngine.Source.Prefabs;
+using KeatsoticEngine.Source.Screens;
 using KeatsoticEngine.Source.World;
+using KeatsoticEngine.Source.World.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,8 +23,10 @@ namespace KeatsoticEngine.Source.Manager
 		private List<TileCollisionDoor> _doors;
 		private TiledMap _tiledMap;
 		private TiledMapRenderer _tiledMapRenderer;
+		private ManageScreens _manageScreens;
 
 		public static string RoomNumber = "1";
+		public static string Level = Game1.startLevel;
 
 		private GraphicsDeviceManager _graphics;
 		private Vector2 _roomMin;
@@ -30,15 +34,16 @@ namespace KeatsoticEngine.Source.Manager
 
 		public string MapName { get; private set; }
 
-		public ManageMap(string mapName, GraphicsDeviceManager graphics)
+		public ManageMap(string mapName, GraphicsDeviceManager graphics, ManageScreens manageScreens)
 		{
 			_tileCollisions = new List<TileCollision>();
 			_doors = new List<TileCollisionDoor>();
 			MapName = mapName;
 			_graphics = graphics;
+			_manageScreens = manageScreens;
 		}
 
-		public void LoadMap(Entities entities, ContentManager content, out Entities outEntities)
+		public void LoadMap(Entities entities, ContentManager content, bool killplayer, out Entities outEntities)
 		{
 
 			_tiledMap = content.Load<TiledMap>("Tilesets/" + MapName);
@@ -48,6 +53,14 @@ namespace KeatsoticEngine.Source.Manager
 			var _objectLayer = _tiledMap.GetLayer<TiledMapObjectLayer>("Room_" + RoomNumber);
 			var _entitiesFromMap = new List<GameObject>();
 
+			if (!killplayer)
+			{
+				var createPlayer = new PlayerPrefab(entities,
+													this,
+													content,
+													HUD.PlayerCurrentPosition,
+													out entities);
+			}
 
 
 			if (_objectLayer != null)
@@ -68,7 +81,7 @@ namespace KeatsoticEngine.Source.Manager
 							_roomMax = _objectLayer.Objects[i].Position;
 						}
 					}
-					if (_objectLayer.Objects[i].Type == "Player") //add the player
+					if (_objectLayer.Objects[i].Type == "Player" && killplayer) //add the player
 					{
 						if (_objectLayer.Objects[i].Name == "PlayerStart")
 						{
@@ -101,7 +114,7 @@ namespace KeatsoticEngine.Source.Manager
 														 (int)_objectLayer.Objects[i].Size.Height, 
 														 _objectLayer.Objects[i].Name));
 					}
-				}
+				} 
 			}
 			outEntities = entities;
 
@@ -112,8 +125,8 @@ namespace KeatsoticEngine.Source.Manager
 			{
 				for (int j = 0; j < _tiledMap.Height; j++)
 				{
-					if ((i > (_roomMin.X - tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
-						j > (_roomMin.Y - tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight) &&
+					if ((i >= (_roomMin.X - tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
+						j >= (_roomMin.Y - tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight) &&
 						(i <= (_roomMax.X + tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
 						j <= (_roomMax.Y + tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight))
 					{
@@ -144,9 +157,48 @@ namespace KeatsoticEngine.Source.Manager
 			return _tileCollisions.Any(tile => tile.Intersect(rectangle));
 		}
 
-		public bool CheckCollisionDoor(Rectangle rectangle)
+		public Rectangle CheckCollisionDoor(Rectangle rectangle, out string roomNumber)
 		{
-			return _doors.Any(door => door.Intersect(rectangle));
+			for (var i = 0; i < _doors.Count; i++)
+			{
+				if (_doors[i].Intersect(rectangle))
+				{
+					roomNumber = _doors[i].RoomNumber;
+					return _doors[i].Rectangle;
+				}
+			}
+			roomNumber = "";
+			return Rectangle.Empty;
+		}
+
+		public void StartTransition(string levelName, string roomNumber, string transitionType)
+		{
+			switch (transitionType)
+			{
+				case "SlidingRight":
+					RoomNumber = roomNumber;
+					_manageScreens.LoadNewScreen(new ScreenWorld(_manageScreens, false), "SlidingRight");
+					break;
+				case "SlidingLeft":
+					RoomNumber = roomNumber;
+					_manageScreens.LoadNewScreen(new ScreenWorld(_manageScreens, false), "SlidingLeft");
+					break;
+				case "SlidingUp":
+					RoomNumber = roomNumber;
+					_manageScreens.LoadNewScreen(new ScreenWorld(_manageScreens, false), "SlidingUp");
+					break;
+				case "SlidingDown":
+					RoomNumber = roomNumber;
+					_manageScreens.LoadNewScreen(new ScreenWorld(_manageScreens, false), "SlidingDown");
+					break;
+
+				case "Fading":
+					RoomNumber = roomNumber;
+					_manageScreens.LoadNewScreen(new ScreenWorld(_manageScreens, true), "Fading");
+					break;
+			}
+
+
 		}
 	}
 }

@@ -19,6 +19,7 @@ namespace KeatsoticEngine
         SpriteBatch spriteBatch;
 
 		public static bool SideScroller = true;
+		public static string startLevel = "m_level_1";
 
 		private int _fpsCounter;
 		private TimeSpan _counterElapsed = TimeSpan.Zero;
@@ -34,14 +35,15 @@ namespace KeatsoticEngine
 			ManageResolution.SetVirtualResolution(480, 270);
 			ManageResolution.SetResolution(1920, 1080, false);
 
-			//IsFixedTimeStep = false;
+			IsFixedTimeStep = false;
         }
 
 
         protected override void Initialize()
         {
 			// TODO: Add your initialization logic here
-
+			ManageInput.CanPressButtons = true;
+			HUD.Initialize();
 			Camera.Initialize();
 			base.Initialize();
         }
@@ -51,8 +53,9 @@ namespace KeatsoticEngine
 			// TODO: use this.Content to load your game content here
 
 			spriteBatch = new SpriteBatch(GraphicsDevice);
+			HUD.LoadContent(Content);
 			_manageScreens = new ManageScreens(Content, graphics);
-			_manageScreens.LoadNewScreen(new ScreenStart(_manageScreens));
+			_manageScreens.LoadNewScreen(new ScreenStart(_manageScreens), "");
 		}
 
 		protected override void UnloadContent()
@@ -67,6 +70,7 @@ namespace KeatsoticEngine
 
 			// TODO: Add your update logic here
 			_manageScreens.Update(gameTime);
+			HUD.Update(gameTime);
 			ManageInput.Update();
 			base.Update(gameTime);
         }
