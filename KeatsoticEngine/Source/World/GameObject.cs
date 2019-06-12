@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using KeatsoticEngine.Source.World.Components;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace KeatsoticEngine.Source.World
 
 		public GameObject()
 		{
-			
 			_components = new List<Component>();
 		}
+
 
 		public TComponentType GetComponent<TComponentType>(ComponentType componentType) where TComponentType : Component
 		{

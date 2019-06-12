@@ -21,6 +21,7 @@ namespace KeatsoticEngine.Source.Manager
 	{
 		private List<TileCollision> _tileCollisions;
 		private List<TileCollisionDoor> _doors;
+		private List<TileCollisionLadder> _ladders;
 		private TiledMap _tiledMap;
 		private TiledMapRenderer _tiledMapRenderer;
 		private ManageScreens _manageScreens;
@@ -37,6 +38,7 @@ namespace KeatsoticEngine.Source.Manager
 		public ManageMap(string mapName, GraphicsDeviceManager graphics, ManageScreens manageScreens)
 		{
 			_tileCollisions = new List<TileCollision>();
+			_ladders = new List<TileCollisionLadder>();
 			_doors = new List<TileCollisionDoor>();
 			MapName = mapName;
 			_graphics = graphics;
@@ -114,6 +116,15 @@ namespace KeatsoticEngine.Source.Manager
 														 (int)_objectLayer.Objects[i].Size.Height, 
 														 _objectLayer.Objects[i].Name));
 					}
+
+					// add doors
+					if (_objectLayer.Objects[i].Type == "Ladder") //add enemies
+					{
+						_ladders.Add(new TileCollisionLadder((int)_objectLayer.Objects[i].Position.X,
+														 (int)_objectLayer.Objects[i].Position.Y,
+													 	 (int)_objectLayer.Objects[i].Size.Width,
+														 (int)_objectLayer.Objects[i].Size.Height));
+					}
 				} 
 			}
 			outEntities = entities;
@@ -152,6 +163,9 @@ namespace KeatsoticEngine.Source.Manager
 			_tiledMapRenderer.Draw(_tiledMap, Camera.GetTransformMatrix());
 		}
 
+
+		//collision methods
+
 		public bool CheckCollision(Rectangle rectangle)
 		{
 			return _tileCollisions.Any(tile => tile.Intersect(rectangle));
@@ -168,6 +182,18 @@ namespace KeatsoticEngine.Source.Manager
 				}
 			}
 			roomNumber = "";
+			return Rectangle.Empty;
+		}
+
+		public Rectangle CheckCollisionLadder(Rectangle rectangle)
+		{
+			for (var i = 0; i < _ladders.Count; i++)
+			{
+				if (_ladders[i].Intersect(rectangle))
+				{
+					return _ladders[i].Rectangle;
+				}
+			}
 			return Rectangle.Empty;
 		}
 

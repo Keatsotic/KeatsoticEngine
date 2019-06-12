@@ -198,13 +198,13 @@ namespace KeatsoticEngine.Source.Manager
 						_cameraSlide = new Vector2(-4, 0);
 						_slideDir = new Vector2(.25f, 0);
 						break;
-					case Direction.Up:
-						_cameraSlide = new Vector2(0, 2f);
-						_slideDir = new Vector2(0, -0.2f);
-						break;
 					case Direction.Down:
-						_cameraSlide = new Vector2(0, -2f);
+						_cameraSlide = new Vector2(0, 2f);
 						_slideDir = new Vector2(0, 0.2f);
+						break;
+					case Direction.Up:
+						_cameraSlide = new Vector2(0, -2f);
+						_slideDir = new Vector2(0, -0.2f);
 						break;
 				}
 			}

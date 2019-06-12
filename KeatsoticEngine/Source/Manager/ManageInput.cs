@@ -185,7 +185,7 @@ namespace KeatsoticEngine
 			playerJump = KeyPressed(Keys.Space) == true || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed;
 			playerJumpCancel = IsKeyUp(Keys.Space) == true || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed;
 
-			playerSpecial = KeyPressed(Keys.B) == true || GamePad.GetState(PlayerIndex.One).Buttons.Y == ButtonState.Pressed;
+			playerSpecial = KeyPressed(Keys.C) == true || GamePad.GetState(PlayerIndex.One).Buttons.Y == ButtonState.Pressed;
 			playerMenu = KeyPressed(Keys.G) == true || GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed;
 
 			playerStart = KeyPressed(Keys.Enter) == true || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed;

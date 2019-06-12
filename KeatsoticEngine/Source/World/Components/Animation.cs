@@ -20,12 +20,13 @@ namespace KeatsoticEngine.Source.World.Components
 		public Rectangle TextureRectangle{ get; set; }
 		public State CurrentState { get; set; }
 		public bool AnimationFinished { get; private set; }
+		public bool StopAnimating { get; set; }
 		private double _counter;
 		public readonly AnimatedSprite objectAnimated;
 		public readonly Sprite objectSprite;
 
 
-		public Animation(Texture2D texture, SpriteSheetData spriteSheetData)
+		public Animation(Texture2D texture, SpriteSheetData spriteSheetData, int direction = 0)
 		{
 			var spriteWidth = spriteSheetData.Width;
 			var spriteHeight = spriteSheetData.Height;
@@ -41,6 +42,13 @@ namespace KeatsoticEngine.Source.World.Components
 			objectAnimated = new AnimatedSprite(animationFactory, "Idle");
 			objectSprite = objectAnimated;
 			objectSprite.Origin = Vector2.Zero;
+
+			if (direction == 1)
+			{
+				objectAnimated.Effect = SpriteEffects.None;
+			} else {
+				objectAnimated.Effect = SpriteEffects.FlipHorizontally;
+			}
 		}
 		
 		public override void Update(GameTime gameTime)
@@ -56,7 +64,7 @@ namespace KeatsoticEngine.Source.World.Components
 
 			if (_counter > 50)
 			{
-				if (CurrentState.ToString().Contains("Attack") || CurrentState.ToString().Contains("Hurt"))
+				if (CurrentState.ToString().Contains("Attack") || CurrentState.ToString().Contains("Hurt") || CurrentState.ToString().Contains("Throw"))
 				{
 					objectAnimated.Play(CurrentState.ToString(), () => AnimationFinished = true);
 				}
@@ -70,8 +78,8 @@ namespace KeatsoticEngine.Source.World.Components
 				ChangeDirection();
 			}
 
-
-			objectAnimated.Update(gameTime);
+			if (!StopAnimating)
+				objectAnimated.Update(gameTime);
 			
 			objectAnimated.Position = transform.Position;
 			
@@ -104,6 +112,9 @@ namespace KeatsoticEngine.Source.World.Components
 		private void ChangeDirection()
 		{
 			var transform = GetComponent<Transform>(ComponentType.Transform);
+			if (transform == null)
+				return;
+
 			if (!Game1.SideScroller)
 			{
 				switch (transform.Direction)

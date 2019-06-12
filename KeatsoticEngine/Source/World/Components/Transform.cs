@@ -91,7 +91,7 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 		}
 
-		//move function for platforms or transistions
+		//move function for platforms transistions ladders
 		public void Move(Direction direction, float x, float y)
 		{
 			switch(direction)

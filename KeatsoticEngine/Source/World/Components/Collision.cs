@@ -35,14 +35,19 @@ namespace KeatsoticEngine.Source.World.Components
 		}
 
 
-		public bool CheckCollision(Rectangle rectangle, bool fixBox = true)
+		public bool CheckCollision(Rectangle rectangle)
 		{
 			return _manageMap.CheckCollision(rectangle);
 		}
 
-		public Rectangle CheckCollisionDoor(Rectangle rectangle, bool fixBox = true)
+		public Rectangle CheckCollisionDoor(Rectangle rectangle)
 		{
 			return _manageMap.CheckCollisionDoor(rectangle, out _roomNumber);
+		}
+
+		public Rectangle CheckCollisionLadder(Rectangle rectangle)
+		{
+			return _manageMap.CheckCollisionLadder(rectangle);
 		}
 
 		public override void Update(GameTime gameTime)
@@ -108,17 +113,20 @@ namespace KeatsoticEngine.Source.World.Components
 			transform.Position.Y += _vspd;
 
 
+			#region PLAYER SPECIFIC COLLISIONS
 
-			//check for door if we are the player
+			//player specific collisions
 			var owner = GetOwnerId();
-			
 			var doorRect = CheckCollisionDoor(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
 													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
 													 BoundingBoxSetter.Width,
 													 BoundingBoxSetter.Height));
+			if (owner != "Player")
+				return;
 
-			if (owner == "Player" && ManageInput.CanPressButtons)
+			if (ManageInput.CanPressButtons)
 			{
+				//check for door
 				if (_roomNumber != "")
 				{
 					if (_roomNumber.Length < 3)
@@ -127,9 +135,9 @@ namespace KeatsoticEngine.Source.World.Components
 						if (position == null)
 							return;
 
-						if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y && position.Y + BoundingBoxSetter.Y >doorRect.Y +doorRect.Height)
+						if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y && position.Y < doorRect.Y + doorRect.Height)
 						{
-							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingDown");
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingUp");
 						}
 						else if (position.X + BoundingBoxSetter.X < doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y)
 						{
@@ -141,7 +149,7 @@ namespace KeatsoticEngine.Source.World.Components
 						}
 						else if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y < doorRect.Y)
 						{
-							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingUp");
+							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingDown");
 						}
 					}
 					else if (_roomNumber.Length > 3)
@@ -149,7 +157,26 @@ namespace KeatsoticEngine.Source.World.Components
 						_manageMap.StartTransition(_roomNumber, "1", "Fading");
 					}
 				}
+
+				//check for ladder
+				var ladderRect = CheckCollisionLadder(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+													 BoundingBoxSetter.Width,
+													 BoundingBoxSetter.Height));
+
+				var player = GetComponent<PlayerController>(ComponentType.PlayerController);
+
+				if (ladderRect != Rectangle.Empty && ManageInput.playerUp)
+				{
+					transform.Position.X = ladderRect.X + (ladderRect.Width / 2) - 27;
+					player.isOnLadder = true;
+				} 
+				else if (ladderRect == Rectangle.Empty && player.CurrentState == State.Ladder)
+				{
+					player.CurrentState = State.Fall;
+				}
 			}
+			#endregion
 		}
 	}
 }

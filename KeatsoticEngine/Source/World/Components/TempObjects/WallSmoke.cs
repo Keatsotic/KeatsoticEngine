@@ -30,7 +30,6 @@ namespace KeatsoticEngine.Source.World.Components.TempObjects
 		{
 			_animation.Play("Smoke", () => _entities.RemoveEntities(this));
 			_animation.Update(gameTime);
-			
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)

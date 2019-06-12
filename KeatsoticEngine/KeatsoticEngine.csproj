@@ -57,6 +57,7 @@
     <Compile Include="Source\Map\ObjectSpawn.cs" />
     <Compile Include="Source\Map\TileCollisionDoor.cs" />
     <Compile Include="Source\Map\TileCollision.cs" />
+    <Compile Include="Source\Map\TileCollisionLadder.cs" />
     <Compile Include="Source\Prefabs\CrawlerPrefab.cs" />
     <Compile Include="Source\Prefabs\PlayerPrefab.cs" />
     <Compile Include="Source\Screens\Screen.cs" />
@@ -76,9 +77,8 @@
     <Compile Include="Source\World\Components\Sprite.cs" />
     <Compile Include="Source\World\Components\TempObjects\WallSmoke.cs" />
     <Compile Include="Source\World\Components\Transform.cs" />
-    <Compile Include="Source\World\Components\Weapons\Equipment.cs" />
     <Compile Include="Source\World\Components\Weapons\Shuriken.cs" />
-    <Compile Include="Source\World\Components\Weapons\SpecialAttacks.cs" />
+    <Compile Include="Source\World\Components\TempObjects\Projectile.cs" />
     <Compile Include="Source\World\Entities.cs" />
     <Compile Include="Source\World\GameObject.cs" />
     <Compile Include="Source\World\HUD.cs" />

@@ -7,7 +7,7 @@
 	Collision,
 	Damage,
 
-	Equipment,
+	
 	Shuriken,
 
 	Health,
@@ -54,7 +54,13 @@ public enum State
 	Special,
 	Duck,
 	DuckAttack,
-	WallJump
+	WallJump,
+	Throw, 
+	DuckThrow,
+	WallThrow,
+	Ladder,
+	LadderAttack,
+	LadderThrow
 }
 
 public enum PatrolType
