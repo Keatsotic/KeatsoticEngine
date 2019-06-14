@@ -16,6 +16,7 @@ namespace KeatsoticEngine.Source.Screens
 		private ManageMap _manageMap;
 		private Entities _entities;
 		private bool _killPlayer;
+
 		public ScreenWorld(ManageScreens manageScreens, bool killPlayer) : base(manageScreens)
 		{
 			_manageMap = new ManageMap(ManageMap.Level, manageScreens._graphics, manageScreens);
@@ -44,7 +45,5 @@ namespace KeatsoticEngine.Source.Screens
 			_manageMap.Draw(spriteBatch);
 			_entities.Draw(spriteBatch);
 		}
-
-
 	}
 }

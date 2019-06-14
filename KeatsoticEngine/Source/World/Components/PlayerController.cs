@@ -1,4 +1,5 @@
-﻿using KeatsoticEngine.Source.World.Components.TempObjects;
+﻿using KeatsoticEngine.Source.Data;
+using KeatsoticEngine.Source.World.Components.TempObjects;
 using KeatsoticEngine.Source.World.Components.Weapons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,13 +19,16 @@ namespace KeatsoticEngine.Source.World.Components
 
 		private readonly int _attackTimerMax = 30;
 		private int _attackTimer;
-		private bool _canThrow;
+		private bool _canSpecial;
+		private int _specialTimer;
 		public bool isOnLadder;
+
+		private Equipment _equipedItem;
 
 		private Rectangle _damageRect;
 		private readonly GameObject _damage = new GameObject { Id = "Damage" };
 
-		public static GameObject Player { get; private set; }
+		public static GameObject Player { get; set; }
 
 		public Direction Direction { get; private set; }
 		public State CurrentState { get; set; }
@@ -41,6 +45,12 @@ namespace KeatsoticEngine.Source.World.Components
 			Direction = HUD.PlayerCurrentDirection;
 		}
 
+		public override void Awake(GameObject gameObject)
+		{
+			EquipPlayerItem();
+			base.Awake(gameObject);
+		}
+
 		public override void Update(GameTime gameTime)
 		{
 			//access components
@@ -49,7 +59,7 @@ namespace KeatsoticEngine.Source.World.Components
 			var collision = GetComponent<Collision>(ComponentType.Collision);
 			var animation = GetComponent<Animation>(ComponentType.Animation);
 			var damage = GetComponent<Damage>(ComponentType.Damage);
-
+			
 			if (transform == null || sprite == null || collision == null) 
 				return;
 
@@ -69,7 +79,9 @@ namespace KeatsoticEngine.Source.World.Components
 						CurrentState = State.WallAttack;
 						break;
 					case State.Ladder:
-						animation.StopAnimating = false;
+						CurrentState = State.LadderAttack;
+						break;
+					case State.LadderIdle:
 						CurrentState = State.LadderAttack;
 						break;
 					default:
@@ -80,37 +92,42 @@ namespace KeatsoticEngine.Source.World.Components
 			}
 
 			//special attack
-			if (ManageInput.playerSpecial && _attackTimer <= 0)
+			if (ManageInput.playerSpecial && _specialTimer <= 0 && _equipedItem != null)
 			{
+
 				switch (CurrentState)
 				{
 					case State.Duck:
-						CurrentState = State.DuckThrow;
+						CurrentState = State.DuckSpecial;
 						break;
 					case State.WallJump:
-						CurrentState = State.WallThrow;
+						CurrentState = State.WallSpecial;
 						break;
 					case State.Ladder:
-						animation.StopAnimating = false;
-						CurrentState = State.LadderThrow;
+						CurrentState = State.LadderSpecial;
+						break;
+					case State.LadderIdle:
+						CurrentState = State.LadderSpecial;
 						break;
 
 					default:
-						CurrentState = State.Throw;
+						CurrentState = State.Special;
 						break;
 				}
-				_canThrow = true;
-				_attackTimer = (int)(_attackTimerMax * 0.75);
+				_canSpecial = true;
 			}
-			_attackTimer--;
+
+			if (_attackTimer > 0)
+				_attackTimer--;
+
+			if (_specialTimer > 0)
+				_specialTimer--;
 
 			if (isOnLadder)
 			{
 				CurrentState = State.Ladder;
 				isOnLadder = false;
 			}
-			
-			StateMachine(CurrentState, transform, collision, animation);
 
 			//animation stuff
 			if (animation.AnimationFinished == true)
@@ -136,12 +153,14 @@ namespace KeatsoticEngine.Source.World.Components
 				}
 				_smokeTimer--;
 			}
+
+			StateMachine(CurrentState, transform, collision);
 		}
 
 
 		#region Finite States
 
-		private void StateMachine(State currentState, Transform transform, Collision collision, Animation animation)
+		private void StateMachine(State currentState, Transform transform, Collision collision)
 		{
 			switch (currentState)
 			{
@@ -172,29 +191,32 @@ namespace KeatsoticEngine.Source.World.Components
 				case State.Duck:
 					Duck(collision);
 					break;
-				case State.Throw:
-					Throw(transform);
+				case State.Special:
+					Special(transform);
 					break;
-				case State.WallThrow:
-					WallThrow(transform, collision);
+				case State.WallSpecial:
+					WallSpecial(transform, collision);
 					break;
-				case State.DuckThrow:
-					DuckThrow(transform, collision);
+				case State.DuckSpecial:
+					DuckSpecial(transform, collision);
 					break;
 				case State.Ladder:
-					Ladder(transform, animation);
+					Ladder(transform);
 					break;
 				case State.LadderAttack:
 					LadderAttack(transform);
 					break;
-				case State.LadderThrow:
+				case State.LadderSpecial:
 					LadderThrow(transform, collision);
+					break;
+				case State.LadderIdle:
+					LadderIdle(transform);
 					break;
 				case State.Hurt:
 					//Hurt();
 					break;
 				case State.Dead:
-					//Dead();
+				
 					break;
 				default:
 					CurrentState = State.Idle;
@@ -464,7 +486,7 @@ namespace KeatsoticEngine.Source.World.Components
 		}
 
 
-		private void Throw(Transform transform)
+		private void Special(Transform transform)
 		{
 			ReturnState = State.Idle;
 
@@ -482,68 +504,85 @@ namespace KeatsoticEngine.Source.World.Components
 			transform.Move(transform.Velocity.X, transform.Velocity.Y);
 			
 
-			if (_canThrow)
+			if (_canSpecial)
 			{
-				var projectile = GetComponent<Shuriken>(ComponentType.Shuriken);
-				projectile.FireProjectile(transform, Direction, new Vector2(transform.Position.X + 25, transform.Position.Y + 12));
-				_canThrow = false;
+				_equipedItem.ItemAction(transform, Direction, new Vector2(transform.Position.X + 25, transform.Position.Y + 12), out _specialTimer);
+				_canSpecial = false;
 			}
 		}
 
-		private void DuckThrow(Transform transform, Collision collision)
+		private void DuckSpecial(Transform transform, Collision collision)
 		{
 			ReturnState = State.Duck;
-			if (_canThrow)
+			if (_canSpecial)
 			{
-				var projectile = GetComponent<Shuriken>(ComponentType.Shuriken);
-				projectile.FireProjectile(transform, Direction, new Vector2(transform.Position.X + 25, transform.Position.Y + 18));
-				_canThrow = false;
+				
+				_equipedItem.ItemAction(transform, Direction, new Vector2(transform.Position.X + 25, transform.Position.Y + 18), out _specialTimer);
+				_canSpecial = false;
 			}
 		}
 
-		private void WallThrow(Transform transform, Collision collision)
+		private void WallSpecial(Transform transform, Collision collision)
 		{
 			ReturnState = State.WallJump;
 			transform.Velocity.Y -= 0.4f;
-			if (_canThrow)
+			if (_canSpecial)
 			{
-				var projectile = GetComponent<Shuriken>(ComponentType.Shuriken);
+				
 				var wallThrowDir = Direction == Direction.Right ? Direction.Left : Direction.Right;
 
-				projectile.FireProjectile(transform, wallThrowDir, new Vector2(transform.Position.X + 25, transform.Position.Y + 12));
+				_equipedItem.ItemAction(transform, wallThrowDir, new Vector2(transform.Position.X + 25, transform.Position.Y + 12), out _specialTimer);
 
-				_canThrow = false;
+				_canSpecial = false;
 			}
 		}
 
 
-		private void Ladder(Transform transform, Animation animation)
+		private void Ladder(Transform transform)
+		{
+			transform.IsOnGround = true;
+			transform.Velocity = Vector2.Zero;
+			if (ManageInput.CanPressButtons)
+			{
+				if (!ManageInput.playerUp && !ManageInput.playerDown)
+				{
+					CurrentState = State.LadderIdle;
+				}
+
+				if (ManageInput.playerUp)
+				{
+					transform.Move(Direction.Up, 0f, 2f);
+				}
+				if (ManageInput.playerDown)
+				{
+					transform.Move(Direction.Down, 0f, 2f);
+				}
+				if (ManageInput.playerJump)
+				{
+					CurrentState = State.Fall;
+				}
+			}
+			
+		}
+
+		private void LadderIdle(Transform transform)
 		{
 			transform.IsOnGround = true;
 			transform.Velocity = Vector2.Zero;
 
-			if (!ManageInput.playerUp && !ManageInput.playerDown)
+			if (ManageInput.CanPressButtons)
 			{
-				animation.StopAnimating = true;
+				if (ManageInput.playerUp || ManageInput.playerDown)
+				{
+					CurrentState = State.Ladder;
+				}
+
+				if (ManageInput.playerJump)
+				{
+					CurrentState = State.Fall;
+				}
 			}
 
-			if (ManageInput.playerUp)
-			{
-				animation.StopAnimating = false;
-				transform.Move(Direction.Up, 0f, 2f);
-			}
-			if (ManageInput.playerDown)
-			{
-				animation.StopAnimating = false;
-				transform.Move(Direction.Down, 0f, 2f);
-			}
-			if (ManageInput.playerJump)
-			{
-				animation.StopAnimating = false;
-				CurrentState = State.Fall;
-			}
-
-			
 		}
 
 		private void LadderAttack(Transform transform)
@@ -570,8 +609,38 @@ namespace KeatsoticEngine.Source.World.Components
 		#endregion
 
 
+		public void EquipPlayerItem()
+		{
+			switch (HUD.EquippedItem)
+			{
+				case "Shuriken":
+					var shurikenSpecial = GetComponent<Shuriken>(ComponentType.Shuriken);
+					_equipedItem = shurikenSpecial;
+					break;
+
+				case "FlameStrike":
+					var flameSpecial = GetComponent<FlameStrike>(ComponentType.FlameStrike);
+					_equipedItem = flameSpecial;
+					break;
+
+				case null:
+					//if no items, no quipment, if has star, start level with star
+					if (PlayerStats.UpgrdStar)
+					{ 
+						var defaultSpecial = GetComponent<Shuriken>(ComponentType.Shuriken);
+						_equipedItem = defaultSpecial;
+					} else {
+						_equipedItem = null;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+
 		public override void Draw(SpriteBatch spriteBatch)
 		{
+			
 #if DEBUG
 			if (_attackTimer > _attackTimerMax / 2)
 			{

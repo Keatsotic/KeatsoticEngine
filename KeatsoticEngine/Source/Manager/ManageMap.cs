@@ -22,6 +22,7 @@ namespace KeatsoticEngine.Source.Manager
 		private List<TileCollision> _tileCollisions;
 		private List<TileCollisionDoor> _doors;
 		private List<TileCollisionLadder> _ladders;
+		private Texture2D _tileTexture;
 		private TiledMap _tiledMap;
 		private TiledMapRenderer _tiledMapRenderer;
 		private ManageScreens _manageScreens;
@@ -47,6 +48,7 @@ namespace KeatsoticEngine.Source.Manager
 
 		public void LoadMap(Entities entities, ContentManager content, bool killplayer, out Entities outEntities)
 		{
+			_tileTexture = content.Load<Texture2D>("Textures/s_pixel");
 
 			_tiledMap = content.Load<TiledMap>("Tilesets/" + MapName);
 			_tiledMapRenderer = new TiledMapRenderer(_graphics.GraphicsDevice);
@@ -101,7 +103,7 @@ namespace KeatsoticEngine.Source.Manager
 						switch(_objectLayer.Objects[i].Name)
 						{
 							case "Crawler":
-								var createPlayer = new CrawlerPrefab(entities, this, content, _objectLayer.Objects[i].Position, out entities);
+								var createCrawler = new CrawlerPrefab(entities, this, content, _objectLayer.Objects[i].Position, out entities);
 								break;
 						}
 					}
@@ -136,10 +138,10 @@ namespace KeatsoticEngine.Source.Manager
 			{
 				for (int j = 0; j < _tiledMap.Height; j++)
 				{
-					if ((i >= (_roomMin.X - tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
-						j >= (_roomMin.Y - tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight) &&
-						(i <= (_roomMax.X + tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
-						j <= (_roomMax.Y + tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight))
+					if ((i >= (_roomMin.X - 2 * tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
+						j >= (_roomMin.Y - 2 * tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight) &&
+						(i <= (_roomMax.X + 2 * tiledMapWallsLayer.TileWidth) / tiledMapWallsLayer.TileWidth &&
+						j <= (_roomMax.Y + 2 * tiledMapWallsLayer.TileHeight) / tiledMapWallsLayer.TileHeight)) 
 					{
 						if (tiledMapWallsLayer.TryGetTile(i, j, out TiledMapTile? tile))
 						{
@@ -155,12 +157,20 @@ namespace KeatsoticEngine.Source.Manager
 
 		public void Update(GameTime gameTime)
 		{
-		
+			
 		}
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
 			_tiledMapRenderer.Draw(_tiledMap, Camera.GetTransformMatrix());
+
+#if DEBUG
+
+			foreach (var tile in _tileCollisions)
+			{
+				spriteBatch.Draw(_tileTexture, tile.Rectangle, new Color(Color.Red, 80f));
+			}
+#endif
 		}
 
 

@@ -39,6 +39,7 @@ namespace KeatsoticEngine.Source.World
 			return _gameObject.GetComponent<TComponentType>(componentType);
 		}
 
+		public virtual void Awake(GameObject gameObject) { }
 		public abstract void Update(GameTime gameTime);
 		public abstract void Draw(SpriteBatch spriteBatch);
 	}

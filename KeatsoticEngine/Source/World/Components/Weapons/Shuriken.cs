@@ -13,7 +13,7 @@ using MonoGame.Extended.TextureAtlases;
 
 namespace KeatsoticEngine.Source.World.Components.Weapons
 {
-	class Shuriken : Component
+	class Shuriken : Equipment
 	{
 		private readonly GameObject _owner;
 		private Entities _entities;
@@ -35,7 +35,6 @@ namespace KeatsoticEngine.Source.World.Components.Weapons
 			// create animation sprite
 			var spriteWidth = 9;
 			var spriteHeight = 9;
-			_texture = content.Load<Texture2D>("Textures/s_star");
 			var objectAtlas = TextureAtlas.Create("objectAtlas", _texture, spriteWidth, spriteHeight);
 			_animationFactory = new SpriteSheetAnimationFactory(objectAtlas);
 
@@ -51,7 +50,7 @@ namespace KeatsoticEngine.Source.World.Components.Weapons
 		{
 		}
 
-		public void FireProjectile(Transform transform, Direction direction, Vector2 position)
+		public override void ItemAction(Transform transform, Direction direction, Vector2 position, out int timer)
 		{
 			var x = 0;
 			var y = 0;
@@ -77,7 +76,10 @@ namespace KeatsoticEngine.Source.World.Components.Weapons
 			}
 
 			if (ManageInput.playerSpecial)
-				_entities.AddEntities(new Projectile(_entities, _owner, new Vector2(x, y), position, 1, new AnimatedSprite(_animationFactory, "Init")));
+				_entities.AddEntities(new Projectile(_entities, _owner, new Vector2(x, y), position, 1, new AnimatedSprite(_animationFactory, "Init"), 0));
+
+			timer = 20;
 		}
+
 	}
 }

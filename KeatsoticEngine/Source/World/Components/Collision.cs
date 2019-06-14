@@ -20,6 +20,8 @@ namespace KeatsoticEngine.Source.World.Components
 		private Color bbColor = new Color(Color.Red, 0);
 		private string _roomNumber;
 
+		public bool StartOnLadder { get; set; }
+
 		public override ComponentType ComponentType => ComponentType.Collision;
 
 		public Collision(ManageMap manageMap, Rectangle boundingBox, Vector2 offset, Texture2D bbTexture)
@@ -63,6 +65,10 @@ namespace KeatsoticEngine.Source.World.Components
 		{
 #if DEBUG
 			var transform = GetComponent<Transform>(ComponentType.Transform);
+			CollisionBoundingBox = new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+												 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+												 BoundingBoxSetter.Width,
+												BoundingBoxSetter.Height);
 			
 			spriteBatch.Draw(_bbTexture, CollisionBoundingBox, new Color(112,111,111,3));
 #endif
@@ -89,6 +95,7 @@ namespace KeatsoticEngine.Source.World.Components
 				}
 				_hspd = 0;
 			}
+
 			transform.Position.X += _hspd;
 
 
@@ -131,23 +138,20 @@ namespace KeatsoticEngine.Source.World.Components
 				{
 					if (_roomNumber.Length < 3)
 					{
-						var position = GetComponent<Transform>(ComponentType.Transform).Position;
-						if (position == null)
-							return;
 
-						if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y && position.Y < doorRect.Y + doorRect.Height)
+						if (doorRect.Y < transform.Position.Y + BoundingBoxSetter.Y && doorRect.X + doorRect.Width > transform.Position.X && doorRect.Y + doorRect.Height < transform.Position.Y + BoundingBoxSetter.Height)
 						{
 							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingUp");
 						}
-						else if (position.X + BoundingBoxSetter.X < doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y)
+						else if (transform.Position.X + BoundingBoxSetter.X < doorRect.X && transform.Position.Y + BoundingBoxSetter.Y > doorRect.Y)
 						{
 							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingRight");
 						}
-						else if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y > doorRect.Y)
+						else if (transform.Position.X + BoundingBoxSetter.X > doorRect.X && transform.Position.Y + BoundingBoxSetter.Y > doorRect.Y)
 						{
 							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingLeft");
 						}
-						else if (position.X + BoundingBoxSetter.X > doorRect.X && position.Y + BoundingBoxSetter.Y < doorRect.Y)
+						else if (transform.Position.X + BoundingBoxSetter.X > doorRect.X && transform.Position.Y + BoundingBoxSetter.Y < doorRect.Y)
 						{
 							_manageMap.StartTransition(ManageMap.Level, _roomNumber, "SlidingDown");
 						}
@@ -162,18 +166,35 @@ namespace KeatsoticEngine.Source.World.Components
 				var ladderRect = CheckCollisionLadder(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
 													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
 													 BoundingBoxSetter.Width,
-													 BoundingBoxSetter.Height));
+													 BoundingBoxSetter.Height/2));
 
 				var player = GetComponent<PlayerController>(ComponentType.PlayerController);
 
-				if (ladderRect != Rectangle.Empty && ManageInput.playerUp)
+				if ((ladderRect != Rectangle.Empty && ManageInput.playerUp ) || (StartOnLadder && ladderRect != Rectangle.Empty))
 				{
 					transform.Position.X = ladderRect.X + (ladderRect.Width / 2) - 27;
 					player.isOnLadder = true;
+					StartOnLadder = false;
 				} 
 				else if (ladderRect == Rectangle.Empty && player.CurrentState == State.Ladder)
 				{
 					player.CurrentState = State.Fall;
+				}
+
+				var ladderExitRect = CheckCollisionLadder(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+													 BoundingBoxSetter.Width,
+													 BoundingBoxSetter.Height));
+
+				if (ladderExitRect != Rectangle.Empty && ladderRect == Rectangle.Empty)
+				{
+					while(CheckCollisionLadder(new Rectangle((int)(transform.Position.X + BoundingBoxSetter.X),
+													 (int)(transform.Position.Y + BoundingBoxSetter.Y),
+													 BoundingBoxSetter.Width,
+													 BoundingBoxSetter.Height)) != Rectangle.Empty)
+					{
+						transform.Position.Y -= 1;
+					}
 				}
 			}
 			#endregion

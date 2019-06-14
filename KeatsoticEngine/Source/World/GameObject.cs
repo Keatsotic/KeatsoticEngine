@@ -31,6 +31,7 @@ namespace KeatsoticEngine.Source.World
 		{
 			_components.Add(component);
 			component.Initialize(this);
+			component.Awake(this);
 		}
 
 		public void AddComponent(List<Component> components)
@@ -39,6 +40,7 @@ namespace KeatsoticEngine.Source.World
 			foreach (var component in components)
 			{
 				component.Initialize(this);
+				component.Awake(this);
 			}
 		}
 

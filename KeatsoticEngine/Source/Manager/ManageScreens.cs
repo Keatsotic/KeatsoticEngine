@@ -111,7 +111,6 @@ namespace KeatsoticEngine.Source.Manager
 		{
 			_currentScreen.Update(gameTime);
 
-
 			//fade transition
 			if (_fading && _waitTimer <=0)
 			{
@@ -128,11 +127,15 @@ namespace KeatsoticEngine.Source.Manager
 
 				if (_alpha >= 255 || _alpha <= 0)
 				{
-					if (_waitTimer <= 0)
+
+					FadeTransition();
+					_waitTimer = _waitTimerMax;
+
+					if (_alpha <= 0)
 					{
-						FadeTransition();
-						_waitTimer = _waitTimerMax;
+						_alpha = 0;
 					}
+					
 				}
 			}
 			_waitTimer--;
@@ -168,12 +171,30 @@ namespace KeatsoticEngine.Source.Manager
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
+			spriteBatch.Begin(SpriteSortMode.BackToFront,
+									BlendState.AlphaBlend,
+									SamplerState.PointClamp,
+									null,
+									null,
+									null,
+									Camera.GetTransformMatrix());
 			_currentScreen.Draw(spriteBatch);
+			spriteBatch.End();
 
+			HUD.Draw(spriteBatch);
+
+			spriteBatch.Begin(SpriteSortMode.BackToFront,
+									BlendState.AlphaBlend,
+									SamplerState.PointClamp,
+									null,
+									null,
+									null,
+									Camera.GetTransformMatrix());
 			if (_fading)
 			{
 				spriteBatch.Draw(_fadeRect, Camera.ScreenRect, new Color(Color.Black, _alpha));
 			}
+			spriteBatch.End();
 		}
 
 
@@ -204,7 +225,7 @@ namespace KeatsoticEngine.Source.Manager
 						break;
 					case Direction.Up:
 						_cameraSlide = new Vector2(0, -2f);
-						_slideDir = new Vector2(0, -0.2f);
+						_slideDir = new Vector2(0, 0.2f);
 						break;
 				}
 			}
@@ -215,6 +236,13 @@ namespace KeatsoticEngine.Source.Manager
 				_currentScreen = _screen;
 				_currentScreen.Initialize();
 				_currentScreen.LoadContent(_content);
+
+				if (_direction == Direction.Up || _direction == Direction.Down)
+				{
+					var collision = PlayerController.Player.GetComponent<Collision>(ComponentType.Collision);
+					collision.StartOnLadder = true;
+				}
+
 				ManageInput.CanPressButtons = true;
 			}
 		}
@@ -240,10 +268,10 @@ namespace KeatsoticEngine.Source.Manager
 				_fadingOut = true;
 				_fadingIn = false;
 				_transitionComplete = true;
+				PlayerController.Player = null;
 				_currentScreen = _screen;
 				_currentScreen.Initialize();
 				_currentScreen.LoadContent(_content);
-				_transitionComplete = false;
 				ManageInput.CanPressButtons = true;
 			}
 		}

@@ -18,7 +18,7 @@ namespace KeatsoticEngine
         private static KeyboardState keyboardState = Keyboard.GetState();
         private static KeyboardState lastKeyboardState;
 
-        private static MouseState mouseState;
+		private static MouseState mouseState;
         private static MouseState lastMouseState;
 
 		//player controls
@@ -26,6 +26,12 @@ namespace KeatsoticEngine
 		public static bool playerRight;
 		public static bool playerUp;
 		public static bool playerDown;
+		
+		public static bool playerLeftPressed;
+		public static bool playerRightPressed;
+		public static bool playerUpPressed;
+		public static bool playerDownPressed;
+
 		public static bool playerJump;
 		public static bool playerJumpCancel;
 		public static bool playerAttack;
@@ -35,7 +41,7 @@ namespace KeatsoticEngine
 		public static bool playerSelect;
 
 
-		public static void Update()
+		public static void Update(GameTime gameTime)
         {
 			if (CanPressButtons)
 			{
@@ -50,6 +56,11 @@ namespace KeatsoticEngine
 				{
 					GamePaused = GamePaused == true ? false : true;
 				}
+			}
+
+			if (Game1.RestartGame)
+			{
+				GamePaused = false;
 			}
         }
 
@@ -179,6 +190,12 @@ namespace KeatsoticEngine
 			playerUp = IsKeyDown(Keys.Up) == true || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed;
 			playerDown = IsKeyDown(Keys.Down) == true || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed;
 
+			//momentary direction
+			playerLeftPressed = KeyPressed(Keys.Left) == true || GamePad.GetState(PlayerIndex.One).DPad.Left == ButtonState.Pressed;
+			playerRightPressed = KeyPressed(Keys.Right) == true || GamePad.GetState(PlayerIndex.One).DPad.Right == ButtonState.Pressed;
+
+			playerUpPressed = KeyPressed(Keys.Up) == true || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed;
+			playerDownPressed = KeyPressed(Keys.Down) == true || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed;
 
 			//check for button presses
 			playerAttack = KeyPressed(Keys.V) == true || GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed;

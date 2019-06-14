@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using KeatsoticEngine.Source.World;
 using KeatsoticEngine.Source.Screens;
 using System;
+using static KeatsoticEngine.Source.Data.SaveLoad;
 
 namespace KeatsoticEngine
 {
@@ -20,29 +21,35 @@ namespace KeatsoticEngine
 
 		public static bool SideScroller = true;
 		public static string startLevel = "m_level_1";
+		public static bool RestartGame;
 
 		private int _fpsCounter;
 		private TimeSpan _counterElapsed = TimeSpan.Zero;
-
 		private ManageScreens _manageScreens;
+
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-
+			
 			ManageResolution.Init(ref graphics);
 			ManageResolution.SetVirtualResolution(480, 270);
 			ManageResolution.SetResolution(1920, 1080, false);
 
 			IsFixedTimeStep = false;
-        }
+
+#if DEBUG
+			PlayerStats.StartWithUpgrades();
+#endif
+		}
 
 
-        protected override void Initialize()
+		protected override void Initialize()
         {
 			// TODO: Add your initialization logic here
-			ManageInput.CanPressButtons = true;
+
+			PlayerStats.Initialize();
 			HUD.Initialize();
 			Camera.Initialize();
 			base.Initialize();
@@ -68,10 +75,16 @@ namespace KeatsoticEngine
 			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
 			{ Exit(); }
 
+			if(RestartGame)
+			{
+				RestartGame = false;
+				_manageScreens.LoadNewScreen(new ScreenStart(_manageScreens), "Fading");
+			}
+
 			// TODO: Add your update logic here
 			_manageScreens.Update(gameTime);
 			HUD.Update(gameTime);
-			ManageInput.Update();
+			ManageInput.Update(gameTime);
 			base.Update(gameTime);
         }
 
@@ -95,16 +108,7 @@ namespace KeatsoticEngine
 			// TODO: Add your drawing code here
 
 			ManageResolution.BeginDraw();
-			spriteBatch.Begin(SpriteSortMode.BackToFront,
-								BlendState.AlphaBlend, 
-								SamplerState.PointClamp, 
-								null, 
-								null, 
-								null, 
-								Camera.GetTransformMatrix());
 			_manageScreens.Draw(spriteBatch);
-			spriteBatch.End();
-			HUD.Draw(spriteBatch);
 			base.Draw(gameTime);
         }
 	}

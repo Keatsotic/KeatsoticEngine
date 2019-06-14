@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="500" height="70" tilewidth="16" tileheight="16" infinite="0" nextlayerid="63" nextobjectid="113">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="500" height="70" tilewidth="16" tileheight="16" infinite="0" nextlayerid="63" nextobjectid="116">
  <tileset firstgid="1" name="t_level_01" tilewidth="16" tileheight="16" tilecount="256" columns="16">
   <image source="Tilesets/t_level_01.png" trans="ffffff" width="256" height="256"/>
  </tileset>
@@ -571,7 +571,7 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="50" name="Room_4">
+ <objectgroup id="50" name="Room_4" locked="1">
   <object id="47" name="cameraMin" type="Camera" x="1936" y="656">
    <point/>
   </object>
@@ -581,8 +581,11 @@
   <object id="77" name="3" type="Door" x="1920" y="624" width="16" height="272"/>
   <object id="86" type="Ladder" x="3596" y="592" width="8" height="224"/>
   <object id="93" name="5" type="Door" x="3488" y="608" width="224" height="16"/>
+  <object id="113" name="PlayerStart" type="Player" x="3392" y="832">
+   <point/>
+  </object>
  </objectgroup>
- <objectgroup id="59" name="Room_5" locked="1">
+ <objectgroup id="59" name="Room_5">
   <object id="87" name="cameraMin" type="Camera" x="2224" y="416">
    <point/>
   </object>
@@ -591,7 +594,13 @@
   </object>
   <object id="89" name="4" type="Door" x="3488" y="624" width="224" height="16"/>
   <object id="91" type="Ladder" x="3596" y="592" width="8" height="224"/>
-  <object id="92" name="6" type="Door" x="5200" y="624" width="464" height="16"/>
+  <object id="92" name="6" type="Door" x="5024" y="656" width="640" height="16"/>
+  <object id="114" name="Crawler" type="Enemy" x="3712" y="528">
+   <point/>
+  </object>
+  <object id="115" name="Crawler" type="Enemy" x="3504" y="496">
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup id="60" name="Room_6" locked="1">
   <object id="95" name="cameraMax" type="Camera" x="7024" y="896">

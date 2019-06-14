@@ -46,11 +46,14 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Data\PlayerStats.cs" />
+    <Compile Include="Source\Data\SaveLoad.cs" />
     <Compile Include="Source\Data\SpriteSheetData.cs" />
     <Compile Include="Source\Manager\ManageFunction.cs" />
     <Compile Include="Source\Manager\ManageInput.cs" />
     <Compile Include="Source\Manager\Camera.cs" />
     <Compile Include="Source\Manager\ManageMap.cs" />
+    <Compile Include="Source\Manager\ManageMenu.cs" />
     <Compile Include="Source\Manager\ManageResolution.cs" />
     <Compile Include="Source\Manager\ManageScreens.cs" />
     <Compile Include="Source\Map\EnemySpawn.cs" />
@@ -61,6 +64,7 @@
     <Compile Include="Source\Prefabs\CrawlerPrefab.cs" />
     <Compile Include="Source\Prefabs\PlayerPrefab.cs" />
     <Compile Include="Source\Screens\Screen.cs" />
+    <Compile Include="Source\Screens\ScreenLoad.cs" />
     <Compile Include="Source\Screens\ScreenStart.cs" />
     <Compile Include="Source\Screens\ScreenWorld.cs" />
     <Compile Include="Source\World\Component.cs" />
@@ -77,6 +81,8 @@
     <Compile Include="Source\World\Components\Sprite.cs" />
     <Compile Include="Source\World\Components\TempObjects\WallSmoke.cs" />
     <Compile Include="Source\World\Components\Transform.cs" />
+    <Compile Include="Source\World\Components\Weapons\Equipment.cs" />
+    <Compile Include="Source\World\Components\Weapons\FlameStrike.cs" />
     <Compile Include="Source\World\Components\Weapons\Shuriken.cs" />
     <Compile Include="Source\World\Components\TempObjects\Projectile.cs" />
     <Compile Include="Source\World\Entities.cs" />

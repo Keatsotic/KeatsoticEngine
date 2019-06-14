@@ -8,7 +8,9 @@
 	Damage,
 
 	
-	Shuriken,
+	Equipment,
+	Shuriken, 
+	FlameStrike,
 
 	Health,
 	EfxGenerator,
@@ -51,16 +53,17 @@ public enum State
 	//player only states:
 	Fall,
 	WallAttack,
-	Special,
 	Duck,
 	DuckAttack,
 	WallJump,
-	Throw, 
-	DuckThrow,
-	WallThrow,
+	Special, 
+	DuckSpecial,
+	WallSpecial,
+
 	Ladder,
 	LadderAttack,
-	LadderThrow
+	LadderSpecial,
+	LadderIdle
 }
 
 public enum PatrolType

@@ -20,13 +20,12 @@ namespace KeatsoticEngine.Source.World.Components
 		public Rectangle TextureRectangle{ get; set; }
 		public State CurrentState { get; set; }
 		public bool AnimationFinished { get; private set; }
-		public bool StopAnimating { get; set; }
 		private double _counter;
 		public readonly AnimatedSprite objectAnimated;
 		public readonly Sprite objectSprite;
 
 
-		public Animation(Texture2D texture, SpriteSheetData spriteSheetData, int direction = 0)
+		public Animation(Texture2D texture, SpriteSheetData spriteSheetData, int direction = 0, bool isPlayer = false)
 		{
 			var spriteWidth = spriteSheetData.Width;
 			var spriteHeight = spriteSheetData.Height;
@@ -39,11 +38,19 @@ namespace KeatsoticEngine.Source.World.Components
 				animationFactory.Add(spriteSheetData.AnimationName[i], new SpriteSheetAnimationData(spriteSheetData.FrameArray[i], spriteSheetData.FrameDuration[i], spriteSheetData.IsLooping[i]));
 			}
 
-			objectAnimated = new AnimatedSprite(animationFactory, "Idle");
+			if (isPlayer)
+			{
+				objectAnimated = new AnimatedSprite(animationFactory, HUD.PlayerCurrentState.ToString());
+			}
+			else
+			{
+				objectAnimated = new AnimatedSprite(animationFactory, "Idle");
+			}
+
 			objectSprite = objectAnimated;
 			objectSprite.Origin = Vector2.Zero;
 
-			if (direction == 1)
+			if (direction == (int)Direction.Right)
 			{
 				objectAnimated.Effect = SpriteEffects.None;
 			} else {
@@ -55,16 +62,12 @@ namespace KeatsoticEngine.Source.World.Components
 		{
 			AnimationFinished = false;
 			var damage = GetComponent<Damage>(ComponentType.Damage);
-			var transform = GetComponent<Transform>(ComponentType.Transform);
-
-		if (transform == null)
-			return;
 
 			_counter += gameTime.ElapsedGameTime.TotalMilliseconds;
 
 			if (_counter > 50)
 			{
-				if (CurrentState.ToString().Contains("Attack") || CurrentState.ToString().Contains("Hurt") || CurrentState.ToString().Contains("Throw"))
+				if (CurrentState.ToString().Contains("Attack") || CurrentState.ToString().Contains("Hurt") || CurrentState.ToString().Contains("Special"))
 				{
 					objectAnimated.Play(CurrentState.ToString(), () => AnimationFinished = true);
 				}
@@ -78,12 +81,9 @@ namespace KeatsoticEngine.Source.World.Components
 				ChangeDirection();
 			}
 
-			if (!StopAnimating)
-				objectAnimated.Update(gameTime);
+			objectAnimated.Update(gameTime);
 			
-			objectAnimated.Position = transform.Position;
-			
-
+			//flash sprite when hurt
 			if (damage == null)
 				return;
 			if (damage.IsInvincible)
@@ -105,8 +105,12 @@ namespace KeatsoticEngine.Source.World.Components
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			spriteBatch.Draw(objectSprite);
+			var transform = GetComponent<Transform>(ComponentType.Transform);
+			if (transform == null)
+				return;
+			objectAnimated.Position = transform.Position;
 
+			spriteBatch.Draw(objectSprite);
 		}
 
 		private void ChangeDirection()

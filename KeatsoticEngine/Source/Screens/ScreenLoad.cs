@@ -14,21 +14,25 @@ using MonoGame.Extended.Sprites;
 
 namespace KeatsoticEngine.Source.Screens
 {
-	class ScreenStart : Screen
+	class ScreenLoad : Screen
 	{
 		private Texture2D _texture;
 
 		public AnimatedSprite ObjectAnimated { get; private set; }
 		public AnimatedSprite ObjectSprite { get; private set; }
 		private bool _canPressStart;
+		private SpriteFont _font;
+		private int _timer = 60;
 
-		public ScreenStart(ManageScreens manageScreens) : base(manageScreens)
+		public ScreenLoad(ManageScreens manageScreens) : base(manageScreens)
 		{
-			
+			Camera.cameraMax = Vector2.Zero + Camera.cameraOffset;
+			Camera.cameraMin = Vector2.Zero + Camera.cameraOffset;
 		}
 		public override void LoadContent(ContentManager content)
 		{
-			_texture = content.Load<Texture2D>("Textures/s_start_screen");
+			_texture = content.Load<Texture2D>("Textures/s_load_screen");
+			_font = content.Load<SpriteFont>("Fonts/f_menu");
 
 			var spriteWidth = 480;
 			var spriteHeight = 270;
@@ -37,20 +41,18 @@ namespace KeatsoticEngine.Source.Screens
 
 			var animationFactory = new SpriteSheetAnimationFactory(objectAtlas);
 
-			animationFactory.Add("Fade", new SpriteSheetAnimationData(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 0.3f, false));
-			animationFactory.Add("StartScreen", new SpriteSheetAnimationData(new[] { 10, 11, 12, 13 }, 0.3f));
+			
+			animationFactory.Add("LoadScreen", new SpriteSheetAnimationData(new[] { 0 }, 0.3f));
 
-			ObjectAnimated = new AnimatedSprite(animationFactory, "StartScreen");
+			ObjectAnimated = new AnimatedSprite(animationFactory, "LoadScreen");
 			ObjectSprite = ObjectAnimated;
 
 			ObjectSprite.Origin = Vector2.Zero;
-			ObjectAnimated.Play("Fade", () => _canPressStart = true);
+			
 		}
 
 		public override void Initialize()
 		{
-			Camera.cameraMax = Vector2.Zero + Camera.cameraOffset;
-			Camera.cameraMin = Vector2.Zero + Camera.cameraOffset;
 			base.Initialize();
 		}
 
@@ -59,20 +61,26 @@ namespace KeatsoticEngine.Source.Screens
 			Camera.Update(Vector2.Zero);
 			ObjectAnimated.Update(gameTime);
 
+			if (_timer <= 0)
+				_canPressStart = true;
+
+
 			if (_canPressStart)
 			{
-				ObjectAnimated.Play("StartScreen");
-
 				if (ManageInput.playerStart)
 				{
-					ManageScreens.LoadNewScreen(new ScreenLoad(ManageScreens), "Fading");
+					ManageScreens.LoadNewScreen(new ScreenWorld(ManageScreens, true), "Fading");
 				}
 			}
+			_timer--;
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			spriteBatch.Draw(ObjectSprite);
+			//spriteBatch.Draw(ObjectSprite);
+			spriteBatch.DrawString(_font, "Continue", new Vector2(170, 80), Color.White);
+			spriteBatch.DrawString(_font, "New Game", new Vector2(170, 130), Color.White);
+			spriteBatch.DrawString(_font, "Options", new Vector2(170, 180), Color.White);
 		}
 	}
 }
